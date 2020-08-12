@@ -186,22 +186,28 @@ print(flag)                           # print flag!
 
 ## WRITE4 64 bit<a name="write4"></a>
 
-> ## 1. Problem
->>
->>
+> ### 1. Problem
+>> In this challenge there is no magic string we can call upon to print the flag. There is however,
+>> a function that executes a system call to print a file and takes a string as an argument.
 
-> ## 2. Solution
->>
->>
->> - [ ] Place hold
+> ### 2. Solution
+>> Since there is no string in memory we can use to print out the flag.txt file, the string will
+>> have to be written into a memory location so that it can be used as an argument. Thus the goal here 
+>> is to:
+>> - [ ] **Locate a writeable location in memory to place our string**
 >>>
 >>>
->> - [ ] Place Hold
+>> - [ ] **Locate the print tile function to grab the flag**
+>>> 
+>>> 
+>> - [ ] **Locate a ROP gadget that can be used to write to a memory location**
 >>>
 >>>
->> - [ ] Place hold
+>> - [ ] **Locate a `pop rdi; ret;` we can use to supply the print file function with the string argument** 
 >>>
 >>>
+>> - [ ] **Write an exploit chaining all of the elements together and execute**
+>>> As always, I used a pwntools script to automate the exploit.
 
 ~~~python
 
