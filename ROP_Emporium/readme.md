@@ -4,7 +4,7 @@
 
 | Challenge          | Walkthrough                                                                                  |
 | ------------       | --------                                                                                     |
-| [Ret2Win](#ret2win)| [pdf](ttps://github.com/jpowellroot/Pwnfolio/blob/master/ROP_Emporium/Writeups/Ret2win64.pdf)|
+| [Ret2Win](#ret2win)| [pdf](https://github.com/jpowellroot/Pwnfolio/blob/master/ROP_Emporium/Writeups/Ret2win64.pdf)|
 | Split              |                                                                                              |
 | Callme             |                                                                                              |
 | Write4             |                                                                                              |
