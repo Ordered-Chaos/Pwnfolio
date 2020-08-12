@@ -2,12 +2,12 @@
 
 ***
 
-| Challenge          | Walkthrough                                                                                   |
-| ------------       | --------                                                                                      |
-| [Ret2Win](#ret2win)| [pdf](https://github.com/jpowellroot/Pwnfolio/blob/master/ROP_Emporium/Writeups/Ret2win64.pdf)|
-| [Split](#split)    | [pdf](https://github.com/jpowellroot/Pwnfolio/blob/master/ROP_Emporium/Writeups/Split64.pdf)  |                                                                                     
-| CallMe             |                                                                                               |
-| Write4             |                                                                                               |
+| Challenge          | Walkthrough                                                                                     |
+| ------------       | --------                                                                                        |
+| [Ret2Win](#ret2win)| [pdf](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/ROP_Emporium/Writeups/Ret2win64.pdf)|
+| [Split](#split)    | [pdf](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/ROP_Emporium/Writeups/Split64.pdf)  |                                                                              
+| CallMe             |                                                                                                 |
+| Write4             |                                                                                                 |
 
 ***
 
