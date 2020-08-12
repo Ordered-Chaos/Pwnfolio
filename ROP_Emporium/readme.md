@@ -8,6 +8,10 @@
 | [Split](#split)    | [pdf](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/ROP_Emporium/Writeups/Split64.pdf)  |                                                         
 | [CallMe](#callme)  | [pdf](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/ROP_Emporium/Writeups/Callme64.pdf) |
 | [Write4](#write4)  | [pdf](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/ROP_Emporium/Writeups/Write4.pdf)   |
+| Badchars           | tbd |
+| Fluff              | tbd |
+| Pivot              | tbd |
+| Ret2Csu            | tbd |
 
 ***
 
