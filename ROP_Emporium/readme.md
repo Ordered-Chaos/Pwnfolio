@@ -21,7 +21,7 @@
 >> The goal here is to:
 >>
 >> - [ ] **Find offset of the ret2win function**
->>> I used the `> afl` command in radare2 to list the functions with their offsets.
+>>> I used the `[0xradare2]> afl` command in radare2 to list the functions with their offsets.
 >>> This showed me that the ret2win function was located at address 0x00400756.
 >>>
 >> - [ ] **Find out the buffer length**
@@ -68,15 +68,15 @@ io.recvall()
 >>
 >> - [ ] **Find the address offset of the system call**
 >>> Here I used the `> afl` command in radare2 to list the functions. From there I navigated to 
->>> the *usefulFunction* using `>  usefulFunction` followed by a `> pdf` command to disassemble
+>>> the *usefulFunction* using `[0xradare2]> s usefulFunction` followed by a `[0xradare2]> pdf` command to disassemble
 >>> the function. This gave me the address of the system call.
 >>>
 >> - [ ] **Find the address offset of the `/bin/cat flag.txt` string**
->>> I used the `> iz` command in radare2 to print a list of strings in the binary. From here I 
+>>> I used the `[0xradare2]> iz` command in radare2 to print a list of strings in the binary. From here I 
 >>> was able to find the address of the `/bin/cat flag.txt` string.
 >>>
 >> - [ ] **Find a ROP gadget that can pop our string into `$rdi`**
->>> The `> /R pop rdi;` command in radare2 searches through the binary and lists all ROP gadgets
+>>> The `[0xradare2]> /R pop rdi;` command in radare2 searches through the binary and lists all ROP gadgets
 >>> that have the `pop $rdi` instruction. This gave me the address to the gadget.
 >>>
 >> - [ ] **Overflow the buffer, overwrite `$rsp` and execute the exploit**
@@ -125,13 +125,13 @@ print(flag)
 >> *.plt* address as opposed to their offset. This challanged will be the first in which
 >>  a legitimate rop chain will be used. The goal here will be too:
 >> - [ ] **Find the *.plt* addresses of the 3 required functions**
->>> In radare2, the `> afl` command lists the function along with their *.plt* addresses.
+>>> In radare2, the `[0xradare2]> afl` command lists the function along with their *.plt* addresses.
 >>> All that needs to be done is to note these addresses.
 >>> 
 >> - [ ] **Locate a rop gadget or chain of gadgets that can hold the arguments**
 >>> In 64 bit systems, the first 6 arguments to a function call are passed in the *rdi, rsi, rdx, rcx, 
->>> r8, r9* registers in that order. Using the `> /R pop rdi;` command in radare2 you're able to to see a list rop gadget
->>> chains that start with the `pop rdi` instruction. In this binary, there happens to 
+>>> r8, r9* registers in that order. Using the `[0xradare2]> /R pop rdi;` command in radare2 you're able to to see a list rop gadget
+>>> chains that start with the `pop rdi;` instruction. In this binary, there happens to 
 >>> be a `pop rdi; pop rsi; pop rdx; ret;` chain which is perfect for handling the 3 arguments.
 >>>
 >> - [ ] **Create and execute a script that chains all of the elements together**
@@ -195,16 +195,29 @@ print(flag)                           # print flag!
 >> have to be written into a memory location so that it can be used as an argument. Thus the goal here 
 >> is to:
 >> - [ ] **Locate a writeable location in memory to place our string**
+>>> In radare2 the `[0xradare2]> iS ~ rw` (**i**nformation **s**ection **grep** **r**ead/**w**rite) command can be used to find a information on sections with read/write
+>>> permissions. It will show the physical address, virtual adddress, size, permission and name of the
+>>> sections in the binary. In this case I was able to see that the .data section had rw permission and
+>>> after doing a hexdump using the `> px` (**p**rint he**x**dump) I could see that it was empty as well as large enough
+>>> to hold the string "flag.txt".
 >>>
+>> - [ ] **Locate the print file function to grab the flag**
+>>> Using the `[0xradare2]> afl` command to list the functions in the binary 
+>>> and see the address of the *imp.print_file* function. This function can print a file
+>>> as long as it is supplied the file name as an argument.
 >>>
->> - [ ] **Locate the print tile function to grab the flag**
->>> 
->>> 
 >> - [ ] **Locate a ROP gadget that can be used to write to a memory location**
->>>
+>>> Using the `[0xradare2> izz]` command will get a list of strings present in the binary. 
+>>> there was a listing for a *usefulGadgets* gadgets function. This function contains a 
+>>> `mov qword [r14], r15` gadget which moves the contents of r15 into the location pointed to
+>>> by r14. By putting the "flag.txt" into r15 and the address of the .data section in r14, you can
+>>> write the string to memory essentially. Now using the `[0xradare2> /R pop r14; pop r15;]` command you
+>>> can check for a gadget that allows us to control what goes into these registers, and in this case there is
+>>> a gadget chain present that will do this.
 >>>
 >> - [ ] **Locate a `pop rdi; ret;` we can use to supply the print file function with the string argument** 
->>>
+>>> Using the same `[0xradare2> /R pop rdi; ret;]` command to find a gadget that pops a value in rdi makes this
+>>> a simple process.
 >>>
 >> - [ ] **Write an exploit chaining all of the elements together and execute**
 >>> As always, I used a pwntools script to automate the exploit.
