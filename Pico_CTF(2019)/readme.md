@@ -16,7 +16,9 @@
 >> You can find the program in /problems/handy-shellcode_2_6ad1f834bdcf9fcfb41200ca8d0f55a6 on the shell server.
 >
 > ### Solution
->>
+>> The solution here is pretty straightforward. All you need to do is supply the program with shellcode
+>> and it will execute it. A simple pwntools script using `shellcraft.sh()` as the payload can get this done.
+
 ~~~python
 #!/usr/bin/env python
 
@@ -54,7 +56,11 @@ print io.recv()
 >> You can find the program in /problems/slippery-shellcode_6_7cf1605ec6dfefad68200ceb12dd67a1 on the shell server.
 >
 > ### Solution
->>
+>> In this challenge we again need to supply the program with shellcode using `shellcraft.sh()`. The source code
+>> reveals that this time, the program will begin execution of the shellcode from a random location within a 256 
+>> byte range. To make sure that we execute our code, all that needs to be done is to supply an 'x\90' NOP sled
+>> that's 256 bytes long directly preceding the shellcode. This can be done with the following pwntools script.
+
 ~~~python
 #!/usr/bin/env python
 
