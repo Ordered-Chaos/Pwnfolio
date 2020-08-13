@@ -31,7 +31,7 @@
 >> - [ ] **Find out the buffer length**
 >>> In the ROP Emporium challenges all of the buffers are 40 bytes long.
 >>>
->> - [ ] **Overflow the buffer and overwrite `$rsp` with the ret2win address offset**
+>> - [ ] **Overflow the buffer and overwrite `rsp` with the ret2win address offset**
 >>> I used a pwntools script in order to execute the exploit.
 
 ~~~python
@@ -71,7 +71,7 @@ io.recvall()
 >> The goal here is to:
 >>
 >> - [ ] **Find the address offset of the system call**
->>> Here I used the `> afl` command in radare2 to list the functions. From there I navigated to 
+>>> Here I used the `[0xradare2]> afl` command in radare2 to list the functions. From there I navigated to 
 >>> the *usefulFunction* using `[0xradare2]> s usefulFunction` followed by a `[0xradare2]> pdf` command to disassemble
 >>> the function. This gave me the address of the system call.
 >>>
@@ -79,11 +79,11 @@ io.recvall()
 >>> I used the `[0xradare2]> iz` command in radare2 to print a list of strings in the binary. From here I 
 >>> was able to find the address of the `/bin/cat flag.txt` string.
 >>>
->> - [ ] **Find a ROP gadget that can pop our string into `$rdi`**
+>> - [ ] **Find a ROP gadget that can pop our string into `rdi`**
 >>> The `[0xradare2]> /R pop rdi;` command in radare2 searches through the binary and lists all ROP gadgets
->>> that have the `pop $rdi` instruction. This gave me the address to the gadget.
+>>> that have the `pop rdi;` instruction. This gave me the address to the gadget.
 >>>
->> - [ ] **Overflow the buffer, overwrite `$rsp` and execute the exploit**
+>> - [ ] **Overflow the buffer, overwrite `rsp` and execute the exploit**
 >>> As always, I created a pwntools script in order to execute the exploit.
 
 ~~~python
@@ -202,7 +202,7 @@ print(flag)                           # print flag!
 >>> In radare2 the `[0xradare2]> iS ~ rw` (**i**nformation **s**ection **grep** **r**ead/**w**rite) command can be used to find a information on sections with read/write
 >>> permissions. It will show the physical address, virtual adddress, size, permission and name of the
 >>> sections in the binary. In this case I was able to see that the .data section had rw permission and
->>> after doing a hexdump using the `> px` (**p**rint he**x**dump) I could see that it was empty as well as large enough
+>>> after doing a hexdump using the `[0xradare2]> px` (**p**rint he**x**dump) I could see that it was empty as well as large enough
 >>> to hold the string "flag.txt".
 >>>
 >> - [ ] **Locate the print file function to grab the flag**
@@ -211,16 +211,16 @@ print(flag)                           # print flag!
 >>> as long as it is supplied the file name as an argument.
 >>>
 >> - [ ] **Locate a ROP gadget that can be used to write to a memory location**
->>> Using the `[0xradare2> izz]` command will get a list of strings present in the binary. 
+>>> Using the `[0xradare2]> izz]` command will get a list of strings present in the binary. 
 >>> there was a listing for a *usefulGadgets* gadgets function. This function contains a 
 >>> `mov qword [r14], r15` gadget which moves the contents of r15 into the location pointed to
 >>> by r14. By putting the "flag.txt" into r15 and the address of the .data section in r14, you can
->>> write the string to memory essentially. Now using the `[0xradare2> /R pop r14; pop r15;]` command you
+>>> write the string to memory essentially. Now using the `[0xradare2]> /R pop r14; pop r15;]` command you
 >>> can check for a gadget that allows us to control what goes into these registers, and in this case there is
 >>> a gadget chain present that will do this.
 >>>
 >> - [ ] **Locate a `pop rdi; ret;` we can use to supply the print file function with the string argument** 
->>> Using the same `[0xradare2> /R pop rdi; ret;]` command to find a gadget that pops a value in rdi makes this
+>>> Using the same `[0xradare2]> /R pop rdi; ret;]` command to find a gadget that pops a value in rdi makes this
 >>> a simple process.
 >>>
 >> - [ ] **Write an exploit chaining all of the elements together and execute**
