@@ -92,7 +92,7 @@ io.recvall()
 
 from pwn import *
 
-elf = context.binary = ELF('split')  # setting up the envronment
+elf = context.binary = ELF('split')  # setting up the environment
 context.log_level = 'debug'       
 
 usefulstring = p64(0x601060)         # 'cat flag.txt' string
@@ -232,7 +232,7 @@ print(flag)                           # print flag!
 
 from pwn import *
 
-elf = context.binary = ELF('write')  # setting up the envronment
+elf = context.binary = ELF('write')  # setting up the environment
 context.log_level = 'debug'       
 
 padding = cyclic(40)                 # junk to fill up buffer
