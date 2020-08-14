@@ -14,11 +14,11 @@
 
 ## RET2WIN 64 bit<a name="ret2win"></a>
 
-> ### 1. Problem
+> ### Problem
 >> In this challenge, there is a function called ret2win located somewhere
 >> in the binary which can be used to cat the flag.txt file. 
 
-> ### 2. Solution
+> ### Solution
 >> The goal here is to:
 >>
 >> - [ ] **Find offset of the ret2win function**
@@ -59,12 +59,12 @@ io.recvall()
 
 ## SPLIT 64 bit<a name="split"></a>
 
-> ### 1. Problem
+> ### Problem
 >> In the split challenge, there exists a function that calls system along with
 >> the string `/bin/cat flag.txt` which is all that is needed to get the flag. The 
 >> twist is that they are split apart and need to be brought together. The goal here is to:
 
-> ### 2. Solution
+> ### Solution
 >> The goal here is to:
 >>
 >> - [ ] **Find the address offset of the system call**
@@ -116,12 +116,12 @@ print(flag)
 
 ## CALLME 64 bit<a name="callme"></a>
 
-> ## 1. Problem
+> ## Problem
 >> In order to get the flag in the callme challenge, there are 3 functions that need
 >> to be called in order. Each function must be called with with the arguments 
 >> *0xdeadbeef, 0xdoodfood, and 0xcafebabe*. 
 
-> ## 2. Solution
+> ## Solution
 >> One important point to note is that the functions will have to be called with their
 >> *.plt* address as opposed to their offset. This challanged will be the first in which
 >>  a legitimate rop chain will be used. The goal here will be too:
@@ -187,11 +187,11 @@ print(flag)                           # print flag!
 
 ## WRITE4 64 bit<a name="write4"></a>
 
-> ### 1. Problem
+> ### Problem
 >> In this challenge there is no magic string we can call upon to print the flag. There is however,
 >> a function that executes a system call to print a file and takes a string as an argument.
 
-> ### 2. Solution
+> ### Solution
 >> Since there is no string in memory we can use to print out the flag.txt file, the string will
 >> have to be written into a memory location so that it can be used as an argument. Thus the goal here 
 >> is to:
