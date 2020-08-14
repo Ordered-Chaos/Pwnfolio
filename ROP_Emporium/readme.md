@@ -53,7 +53,7 @@ io.recvall()
 
 ~~~
 
-**FLAG:**  *ROPE{a_placeholder_32byte_flag!}* 
+**Flag:**  *ROPE{a_placeholder_32byte_flag!}* 
 
 ***
 
@@ -110,7 +110,7 @@ print(flag)
 
 ~~~
 
-**FLAG:**  *ROPE{a_placeholder_32byte_flag!}* 
+**Flag:**  *ROPE{a_placeholder_32byte_flag!}* 
 
 ***
 
@@ -181,7 +181,7 @@ print(flag)                           # print flag!
 
 ~~~
 
-**FLAG:**  *ROPE{a_placeholder_32byte_flag!}* 
+**Flag:**  *ROPE{a_placeholder_32byte_flag!}* 
 
 ***
 
@@ -257,7 +257,7 @@ print(flag)                          # print output
 
 ~~~
 
-**FLAG:**  *ROPE{a_placeholder_32byte_flag!}* 
+**Flag:**  *ROPE{a_placeholder_32byte_flag!}* 
 
 ***
 
