@@ -56,7 +56,7 @@ print io.recv()
 > ### Problem 
 >> This program is a little bit more tricky. Can you spawn a shell and use that to read the flag.txt? 
 >> You can find the program in /problems/slippery-shellcode_6_7cf1605ec6dfefad68200ceb12dd67a1 on the shell server.
->> [(Source)](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/Pico_CTF(2019)/Sources/slipperyshellcode.md#slippershellsource)
+>> [(Source)](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/Pico_CTF(2019)/Sources/slipperyshellcode.md#slipperyshellsource1)
 >
 > ### Solution
 >> In this challenge we again need to supply the program with shellcode using `shellcraft.sh()`. The source code
@@ -92,12 +92,13 @@ print io.recv()
 
 **FLAG:** *picoCTF{sl1pp3ry_sh311c0d3_5a0fefb6}*
 
+[Return to Top](#picoctf19)
 ***
 ## OVERFLOW 0<a name="overflow0"></a>
 
 > ### Problem
 >> This should be easy. Overflow the correct buffer in this program and get a flag. Its also found in 
->> /problems/overflow-0_1_54d12127b2833f7eab9758b43e88d3b7 on the shell server. [(Source)](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/Pico_CTF(2019)/Sources/overflow0source.md#overflow0source)
+>> /problems/overflow-0_1_54d12127b2833f7eab9758b43e88d3b7 on the shell server. [(Source)](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/Pico_CTF(2019)/Sources/overflow0source.md#overflow0source1)
 
 > ##  Solution
 >> After looking at the program, you can tell that it checks to see if `argv[]` is greater or less than the buffer. If it is, then it prints the flag file.
@@ -112,4 +113,5 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
 
 **FLAG:** *picoCTF{3asY_P3a5yb197d4e2}*
 
+[Return to Top](#picoctf19)
 ***
