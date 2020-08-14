@@ -2,10 +2,10 @@
 
 ***
 
-| Problem | Category | Points |
-| ------- | -------- | ------ | 
-| [Handy Shellcode](#handyshellcode) | Binary Exploitation | 50 | 
-| [Slippery Shellcode](#slipperyshellcode) | Binary Exploitation | 200 |
+| Problem | Category | Points | Problem | Category | Points |
+| ------- | -------- | ------ | ------- | -------- | ------ | 
+| [Handy Shellcode](#handyshellcode) | Binary Exploitation | 50 | [Overflow 0](#overflow0) | Binary Exploitation | 100 |
+| [Slippery Shellcode](#slipperyshellcode) | Binary Exploitation | 200 | Overflow 1 | Binary Exploitation | 150 |
 
 ***
 
@@ -94,7 +94,7 @@ print io.recv()
 
 > ### Problem
 >> This should be easy. Overflow the correct buffer in this program and get a flag. Its also found in 
->> /problems/overflow-0_1_54d12127b2833f7eab9758b43e88d3b7 on the shell server. [source] ()
+>> /problems/overflow-0_1_54d12127b2833f7eab9758b43e88d3b7 on the shell server. [source](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/Pico_CTF(2019)/Sources/overflow0source.md)
 
 > ##  Solution
 >> After looking at the program, you can tell that it checks to see if `argv[]` is greater or less than the buffer. If it is, then it prints the flag file.
