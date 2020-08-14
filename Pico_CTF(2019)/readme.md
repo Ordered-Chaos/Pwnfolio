@@ -47,7 +47,7 @@ print io.recv()
 
 ~~~
 
-**FLAG:** *picoCTF{h4ndY_d4ndY_sh311c0d3_707f1a87}*
+**Flag:** *picoCTF{h4ndY_d4ndY_sh311c0d3_707f1a87}*
 
 [Return to Top](#picoctf19)
 ***
@@ -91,7 +91,7 @@ io.sendline('cat flag.txt')
 print io.recv()
 ~~~
 
-**FLAG:** *picoCTF{sl1pp3ry_sh311c0d3_5a0fefb6}*
+**Flag:** *picoCTF{sl1pp3ry_sh311c0d3_5a0fefb6}*
 
 [Return to Top](#picoctf19)
 ***
@@ -112,7 +112,7 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
 ~~~
 
-**FLAG:** *picoCTF{3asY_P3a5yb197d4e2}*
+**Flag:** *picoCTF{3asY_P3a5yb197d4e2}*
 
 [Return to Top](#picoctf19)
 ***
