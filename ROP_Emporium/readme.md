@@ -2,16 +2,13 @@
 
 ***
 
-| Challenge          | Walkthrough                                                                                     |
-| ------------------ | ------------------------------------------------------------------------------------------------|
-| [Ret2Win](#ret2win)| [pdf](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/ROP_Emporium/Writeups/Ret2win64.pdf)|
-| [Split](#split)    | [pdf](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/ROP_Emporium/Writeups/Split64.pdf)  |                                                         
-| [CallMe](#callme)  | [pdf](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/ROP_Emporium/Writeups/Callme64.pdf) |
-| [Write4](#write4)  | [pdf](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/ROP_Emporium/Writeups/Write4.pdf)   |
-| Badchars           | tbd |
-| Fluff              | tbd |
-| Pivot              | tbd |
-| Ret2Csu            | tbd |
+| Challenge          | Walkthrough | Challenge | Walkthrough |
+| ------------------ | ----------- | --------- | ----------- |
+| [Ret2Win](#ret2win)| [pdf](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/ROP_Emporium/Writeups/Ret2win64.pdf)| Badchars           | tbd |
+| [Split](#split)    | [pdf](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/ROP_Emporium/Writeups/Split64.pdf)  | Fluff              | tbd |                           
+| [CallMe](#callme)  | [pdf](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/ROP_Emporium/Writeups/Callme64.pdf) | Pivot              | tbd |
+| [Write4](#write4)  | [pdf](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/ROP_Emporium/Writeups/Write4.pdf)   | Ret2Csu            | tbd |
+
 
 ***
 
