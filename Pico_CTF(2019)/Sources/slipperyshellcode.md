@@ -1,4 +1,4 @@
-[Slippery Shell Code](https://github.com/Ordered-Chaos/Pwnfolio/edit/master/Pico_CTF(2019)/readme.md#slippershellcode)
+[Slippery Shell Code](https://github.com/Ordered-Chaos/Pwnfolio/edit/master/Pico_CTF(2019)/readme.md#slipperyshellcode)
 
 ~~~c
 
