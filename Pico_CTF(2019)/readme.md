@@ -240,7 +240,7 @@ from pwn import *
 context.update(os='linux', arch='amd64')
 context.log_level = 'info'
 
-s = ssh(host='2019shell1.picoctf.com', user='Intrinsic', password='Kanoa2019')
+s = ssh(host='2019shell1.picoctf.com', user='User', password='Pa$$word')
 
 io = s.process('vuln',cwd='/problems/newoverflow-1_2_706ae8f01197e5dbad939821e43cf123')
 
