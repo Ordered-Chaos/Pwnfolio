@@ -261,3 +261,8 @@ io.sendline(payload)
 
 print io.recvall()
 ~~~
+
+**Flag:** *picoCTF{th4t_w4snt_t00_d1ff3r3nt_r1ghT?_7a154fef}*
+
+[Return to Top](#picoctf19)
+***
