@@ -125,8 +125,19 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
 >> [(Source)](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/Pico_CTF(2019)/Sources/overflow1source.md#overflow1source1)
 
 > ### Solution
+>> To solve this challenge there are a few boxes we need to check. We need to:
+
+>> [x] Find out how long the buffer is and at what point we overwrite the `eip` register
+>>> To do this I used pwntools script like the one below except I set the payload to `payload = cyclic(512)` 
+>>> as well as added the line `gdb.attach(io, gdbscript='b* main')`. This allows you to open the file in pwndbg and 
+>>> send a 512 byte long cyclic pattern to make it crash. After the crash you can see that the `eip` register was overwritten
+>>> at `'taaa'` in the pattern. 
+>>
+>> [x] Find the address of the flag function
+>>> Using radare2's `afl` command your able to see a list of functions with addresses. This list includes the flag function.
 >> 
->> 
+>> [x] Craft a payload that fills up the buffer up to `eip`, then overwrite `eip` with the flag function address
+>>>  A pwntools script like the one below can get the job done.
 
 ~~~python
 #!/usr/bin/env python
