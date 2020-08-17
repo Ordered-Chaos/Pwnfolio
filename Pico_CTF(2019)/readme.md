@@ -128,16 +128,16 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
 > ### Solution
 >> To solve this challenge there are a few boxes we need to check. We need to:
 
->> [x] Find out how long the buffer is and at what point we overwrite the `eip` register
+>> - [ ] **Find out how long the buffer is and at what point we overwrite the `eip` register**
 >>> To do this I used pwntools script like the one below except I set the payload to `payload = cyclic(512)` 
 >>> as well as added the line `gdb.attach(io, gdbscript='b* main')`. This allows you to open the file in pwndbg and 
 >>> send a 512 byte long cyclic pattern to make it crash. After the crash you can see that the `eip` register was overwritten
 >>> at `'taaa'` in the pattern. 
 >>
->> [x] Find the address of the flag function
+>> - [ ] **Find the address of the flag function**
 >>> Using radare2's `afl` command your able to see a list of functions with addresses. This list includes the flag function.
 >> 
->> [x] Craft a payload that fills up the buffer up to `eip`, then overwrite `eip` with the flag function address
+>> - [ ] **Craft a payload that fills up the buffer up to `eip`, then overwrite `eip` with the flag function address**
 >>>  A pwntools script like the one below can get the job done.
 
 ~~~python
@@ -177,9 +177,20 @@ print io.recv()
 >> [(Source)](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/Pico_CTF(2019)/Sources/overflow2source.md#overflow2source1)
 
 > ### Solution
+>> The solution here is the mostly the same as in [Overflow 1](#overflow) except this time the flag function
+>> needs to be provided 2 arguments, `0xdeadbeef` and `0xc0ded00d`. So all we need to to do is:
 >>
->>
->>
+>> - [ ] **Find the length of junk input needed to overwrite `eip`**
+>>> To do this I used pwntools script like the one below except I set the payload to `payload = cyclic(512)` 
+>>> as well as added the line `gdb.attach(io, gdbscript='b* main')`. This allows you to open the file in pwndbg and 
+>>> send a 512 byte long cyclic pattern to make it crash. After the crash you can see that the `eip` register was overwritten
+>>> at `'waab'` in the pattern. 
+>>>
+>> - [ ] **Find the address of the flag function**
+>>>  Using radare2's `afl` command your able to see a list of functions with addresses. This list includes the flag function.
+>>>
+>> - [ ] **Write an exploit that calls the flag function and supplies the two argurments**
+>>> A pwntools script like the one below can get the job done.
 
 ~~~python
 #!/usr/bin/env python
@@ -229,9 +240,9 @@ print io.recv()
 >> 5dbad939821e43cf123 on the shell server. [(Source)](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/Pico_CTF(2019)/Sources/newoverflow.md#newoverflowsource1)
 
 > ### Solution
->>
->>
->>
+>> The only thing that changed here is that now the overflow is on a 64 bit binary. One thing to note is that
+>> when running the exploit, the stack my be misaligned. In order to fix this I added the address of a return
+>> ROP gadget. Calling `main` before the flag function also re-aligns the stack.
 ~~~python
 #!/usr/bin/python
 
@@ -268,7 +279,7 @@ print io.recvall()
 [Return to Top](#picoctf19)
 ***
 
-##  New Overvflow<a name="newoverflow2"></a>
+##  New Overvflow 2<a name="newoverflow2"></a>
 
 > ### Problem
 >> Now try overwriting arguments. Can you get the flag from this program? You can find it 
@@ -276,9 +287,8 @@ print io.recvall()
 >> [(Source)](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/Pico_CTF(2019)/Source/newoverflow2.md#newoverflow2source1)
 
 > ### Solution
->>
->>
->>
+>> The writer of this problem left the flag function in there, so instead of using a ROP chain to supply the correct arguments,
+>> you can just use the same script as the [New Overflow](#newoverflow) problem.
 ~~~python
 #!/usr/bin/python
 
