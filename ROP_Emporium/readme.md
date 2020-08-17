@@ -60,6 +60,8 @@ io.recvall()
 
 ## SPLIT 64 bit<a name="split"></a>
 
+[<p align="right">view walkthrough (w/ screenshots)</p>](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/ROP_Emporium/Writeups/Split64.pdf)
+
 > ### Problem
 >> In the split challenge, there exists a function that calls system along with
 >> the string `/bin/cat flag.txt` which is all that is needed to get the flag. The 
@@ -117,6 +119,7 @@ print(flag)
 ***
 
 ## CALLME 64 bit<a name="callme"></a>
+[<p align="right">view walkthrough (w/ screenshots)</p>](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/ROP_Emporium/Writeups/Callme64.pdf)
 
 > ## Problem
 >> In order to get the flag in the callme challenge, there are 3 functions that need
@@ -189,7 +192,7 @@ print(flag)                           # print flag!
 ***
 
 ## WRITE4 64 bit<a name="write4"></a>
-[view write-up (w/ screenshots)](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/ROP_Emporium/Writeups/Write4.pdf) <p align="right"></p>
+[<p align="right">view write-up (w/ screenshots)</p>](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/ROP_Emporium/Writeups/Write4.pdf) 
 
 > ### Problem
 >> In this challenge there is no magic string we can call upon to print the flag. There is however,
