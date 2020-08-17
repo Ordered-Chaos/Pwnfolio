@@ -189,6 +189,7 @@ print(flag)                           # print flag!
 ***
 
 ## WRITE4 64 bit<a name="write4"></a>
+[view write-up (w/ screenshots)](https://github.com/Ordered-Chaos/Pwnfolio/blob/master/ROP_Emporium/Writeups/Write4.pdf) <p align="right"></p>
 
 > ### Problem
 >> In this challenge there is no magic string we can call upon to print the flag. There is however,
