@@ -11,11 +11,11 @@ from pwn import *
 os ='linux'
 arch ='i386'    
 r_host = '2019shell1.picoctf.com'
-r_dir = ''
-r_user = 'Intrinsic'
-r_passwd = 'Kanoa2019'
+r_dir = '/problem/some_directory'
+r_user = 'User'
+r_passwd = 'XXXXXX'
 #r_port = ''                                            
-exe = 'binary name'
+exe = 'binary_name'
 argv = sys.argv
 gdbscript = 'b* main'
 
