@@ -19,7 +19,7 @@ exe = 'binary name'
 argv = sys.argv
 gdbscript = 'b* main'
 
-                  # Environment variables # 
+                  # Context variables # 
 
 context.log_level = 'info'
 context.update(os=os, arch=arch)
