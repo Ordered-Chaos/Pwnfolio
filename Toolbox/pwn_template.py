@@ -1,8 +1,3 @@
-# Pwn Tools Script Template
-
-A prototype pwntools script template I'm working on to automate some common actions.
-
-~~~python
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
@@ -82,4 +77,3 @@ io.interactive()
 #===========================================================
 #                       
 #===========================================================
-~~~
