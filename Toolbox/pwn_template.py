@@ -21,6 +21,7 @@ s = ''
 io = ''
 begin = ''
 end = ''
+data = ''
 
                   # Context variables # 
 
@@ -69,6 +70,14 @@ def finish():
   end = time.time()
   print('Time elapsed: ', end - begin)
 
+def get_data():
+  global s
+  global data
+  while true:
+    data = s.recv(1024)
+    if not data:
+      break
+    print(data)
 #===========================================================
 #                    EXPLOIT GOES HERE
 #===========================================================
