@@ -70,14 +70,16 @@ def finish():
   end = time.time()
   print('Time elapsed: ', end - begin)
 
-def get_data():
-  global s
-  global data
-  while true:
-    data = s.recv(1024)
-    if not data:
-      break
-    print(data)
+# Wwapper function in progress for 'recv()' to prevent hangs if no data received 
+# def get_data():
+  #global s
+  # global data
+  # Try:
+    # data = s.recv()
+    # print(repr(data))
+  # except:
+    # print('No data received')
+    
 #===========================================================
 #                    EXPLOIT GOES HERE
 #===========================================================
