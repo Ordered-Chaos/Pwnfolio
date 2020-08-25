@@ -1,4 +1,3 @@
-
 # PICO CTF (2019)<a name="picoctf19"></a>
 [<p align="right">back to main</p>](https://github.com/Ordered-Chaos/Pwnfolio#main)
 ***
@@ -67,7 +66,7 @@ def start(argv=[], *a, **kw):
     global s
     begin = time.time()
     if gdb:
-      io = process(elf.path)
+      io = process(exe)
       context.update(log_level = 'debug')
       attach_gdb()
       log.info('Setting log level to %s', str(context.log_level))
@@ -78,7 +77,7 @@ def start(argv=[], *a, **kw):
     elif remote:
       context.update(log_level = 'error')
       s = ssh(host=r_host, user=r_user, password=r_passwd)
-      io = s.process(elf, cwd=r_dir)
+      io = s.process(exe, cwd=r_dir)
       log.info('Remote variables set:')
       log.info('Remote host = ', str(r_host))
       log.info('Remote user = ', str(r_user))
@@ -86,7 +85,7 @@ def start(argv=[], *a, **kw):
       log.info('Starting remote exploit...')
 
     else:
-      io = process(elf.path)
+      io = process(exe)
       log.info('Starting local exploit ...')
 
 def finish():
@@ -181,7 +180,7 @@ def start(argv=[], *a, **kw):
     global s
     begin = time.time()
     if gdb:
-      io = process(elf.path)
+      io = process(exe)
       context.update(log_level = 'debug')
       attach_gdb()
       log.info('Setting log level to %s', str(context.log_level))
@@ -192,7 +191,7 @@ def start(argv=[], *a, **kw):
     elif remote:
       context.update(log_level = 'error')
       s = ssh(host=r_host, user=r_user, password=r_passwd)
-      io = s.process(elf, cwd=r_dir)
+      io = s.process(exe, cwd=r_dir)
       log.info('Remote variables set:')
       log.info('Remote host = ', str(r_host))
       log.info('Remote user = ', str(r_user))
@@ -200,7 +199,7 @@ def start(argv=[], *a, **kw):
       log.info('Starting remote exploit...')
 
     else:
-      io = process(elf.path)
+      io = process(exe)
       log.info('Starting local exploit ...')
 
 def finish():
@@ -326,7 +325,7 @@ def start(argv=[], *a, **kw):
     global s
     begin = time.time()
     if gdb:
-      io = process(elf.path)
+      io = process(exe)
       context.update(log_level = 'debug')
       attach_gdb()
       log.info('Setting log level to %s', str(context.log_level))
@@ -337,7 +336,7 @@ def start(argv=[], *a, **kw):
     elif remote:
       context.update(log_level = 'error')
       s = ssh(host=r_host, user=r_user, password=r_passwd)
-      io = s.process(elf, cwd=r_dir)
+      io = s.process(exe, cwd=r_dir)
       log.info('Remote variables set:')
       log.info('Remote host = ', str(r_host))
       log.info('Remote user = ', str(r_user))
@@ -345,7 +344,7 @@ def start(argv=[], *a, **kw):
       log.info('Starting remote exploit...')
 
     else:
-      io = process(elf.path)
+      io = process(exe)
       log.info('Starting local exploit ...')
 
 def finish():
@@ -449,7 +448,7 @@ def start(argv=[], *a, **kw):
     global s
     begin = time.time()
     if gdb:
-      io = process(elf.path)
+      io = process(exe)
       context.update(log_level = 'debug')
       attach_gdb()
       log.info('Setting log level to %s', str(context.log_level))
@@ -460,7 +459,7 @@ def start(argv=[], *a, **kw):
     elif remote:
       context.update(log_level = 'error')
       s = ssh(host=r_host, user=r_user, password=r_passwd)
-      io = s.process(elf, cwd=r_dir)
+      io = s.process(exe, cwd=r_dir)
       log.info('Remote variables set:')
       log.info('Remote host = ', str(r_host))
       log.info('Remote user = ', str(r_user))
@@ -468,7 +467,7 @@ def start(argv=[], *a, **kw):
       log.info('Starting remote exploit...')
 
     else:
-      io = process(elf.path)
+      io = process(exe)
       log.info('Starting local exploit ...')
 
 def finish():
@@ -569,7 +568,7 @@ def start(argv=[], *a, **kw):
     global s
     begin = time.time()
     if gdb:
-      io = process(elf.path)
+      io = process(exe)
       context.update(log_level = 'debug')
       attach_gdb()
       log.info('Setting log level to %s', str(context.log_level))
@@ -580,7 +579,7 @@ def start(argv=[], *a, **kw):
     elif remote:
       context.update(log_level = 'error')
       s = ssh(host=r_host, user=r_user, password=r_passwd)
-      io = s.process(elf, cwd=r_dir)
+      io = s.process(exe, cwd=r_dir)
       log.info('Remote variables set:')
       log.info('Remote host = ', str(r_host))
       log.info('Remote user = ', str(r_user))
@@ -588,7 +587,7 @@ def start(argv=[], *a, **kw):
       log.info('Starting remote exploit...')
 
     else:
-      io = process(elf.path)
+      io = process(exe)
       log.info('Starting local exploit ...')
 
 def finish():
@@ -680,7 +679,7 @@ def start(argv=[], *a, **kw):
     global s
     begin = time.time()
     if gdb:
-      io = process(elf.path)
+      io = process(exe)
       context.update(log_level = 'debug')
       attach_gdb()
       log.info('Setting log level to %s', str(context.log_level))
@@ -691,7 +690,7 @@ def start(argv=[], *a, **kw):
     elif remote:
       context.update(log_level = 'error')
       s = ssh(host=r_host, user=r_user, password=r_passwd)
-      io = s.process(elf, cwd=r_dir)
+      io = s.process(exe, cwd=r_dir)
       log.info('Remote variables set:')
       log.info('Remote host = ', str(r_host))
       log.info('Remote user = ', str(r_user))
@@ -699,7 +698,7 @@ def start(argv=[], *a, **kw):
       log.info('Starting remote exploit...')
 
     else:
-      io = process(elf.path)
+      io = process(exe)
       log.info('Starting local exploit ...')
 
 def finish():
