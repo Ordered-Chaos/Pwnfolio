@@ -59,36 +59,41 @@ def get_flag():
     
     io.close()
 
-# Prompts user for mode (local, remote, debug) and sets the
-# corresponding variable to 'True' or exits if none.
-def setup ():
-    global mode
-    global local
-    global remote
-    global debug
-
-    mode = input('Start exploit in local, remote or debug mode? ')
-    if str('remote') in mode:
-        remote = True
-    elif str('local') in mode:
-        local = True
-    elif str('debug') in mode:
-        debug = True
-    else:
-        exit()
-
 #
 #
 def start():
     global mode
+    global local
+    global remote
+    global debug
     global begin
     global exe
     global io
     global s
     global script
+    
+    i = 3
 
     begin = time.time()
-
+    
+    while i != 0:
+      mode = input('Start exploit in local, remote or debug mode? ')
+      if str('remote') in mode:
+        remote = True
+        break
+      elif str('local') in mode:
+        local = True
+        break
+      elif str('debug') in mode:
+        debug = True
+        break
+      elif i == 0:
+        log.info(f'Exploit mode entered incorrectly. Maximum number of retries exceeded: {i}. Exiting... >_<')
+        exit()
+      else:
+        i -= 1
+        log.info(f'Incorrect mode selected. Number of retries: {i}')
+        
     if debug:
         io = process(exe)
         attach_gdb()
@@ -125,8 +130,6 @@ def finish():
 #===========================================================
 #                    EXPLOIT GOES HERE
 #===========================================================
-setup()
-
 start()
 
 padding = b'\x90' * 256
