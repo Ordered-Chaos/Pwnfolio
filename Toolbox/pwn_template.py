@@ -10,21 +10,21 @@ from pwn import *
 os ='linux'
 arch ='i386'    
 r_host = '2019shell1.picoctf.com'
-r_dir = '/problems/slippery-shellcode_6_7cf1605ec6dfefad68200ceb12dd67a1'
-r_user = 'Intrinsic'
-r_passwd = 'Kanoa2019'
+r_dir = '/some/directory'
+r_user = 'User'
+r_passwd = 'Pa$$w0rd'
 # r_port = ''                                            
 exe = './vuln'
 script = 'b* main'
-mode = ''
 local = False
 remote = False
 debug = False
+mode = ''
 s = ''
 io = ''
+data = ''
 begin = ''
 end = ''
-data = ''
 
                   # Context variables # 
 
