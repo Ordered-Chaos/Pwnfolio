@@ -67,7 +67,7 @@ def start():
     global s
     global script
     
-    i = 3
+    i = 2
 
     begin = time.time()
     
