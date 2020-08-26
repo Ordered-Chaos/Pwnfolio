@@ -8,23 +8,24 @@ from pwn import *
 #=========================================================
 
 os ='linux'
-arch ='i386'    
+arch ='i386' 
+exe = './vuln'
+script = 'b* main'
 r_host = '2019shell1.picoctf.com'
 r_dir = '/some/directory'
 r_user = 'User'
 r_passwd = 'Pa$$w0rd'
-# r_port = ''                                            
-exe = './vuln'
-script = 'b* main'
+r_port = '' 
+s = ssh(host=r_host, user=r_user, password=r_passwd)
 local = False
 remote = False
 debug = False
 mode = ''
-s = ''
 io = ''
 data = ''
 begin = ''
 end = ''
+i = 2
 
                   # Context variables # 
 
@@ -47,12 +48,12 @@ def get_flag():
 
     data = io.recv(timeout=5)
 
-    if not data:
-        log.info('Something went wrong, no data received. Exiting... >_<')
-        exit()
+    if data == b'':
+      log.info('Something went wrong, no data received. Exiting... >_<')
+      exit()
 
     if b'pico' in data:
-        log.info(f"Pwned! Here's your flag: {data}")
+      log.info(f"Pwned! Here's your flag: {data}")
     
     io.close()
 
@@ -64,10 +65,6 @@ def start():
     global debug
     global begin
     global io
-    global s
-    global script
-    
-    i = 2
 
     begin = time.time()
     
@@ -98,7 +95,6 @@ def start():
 
     elif remote:
         context.update(log_level = 'info')
-        s = ssh(host=r_host, user=r_user, password=r_passwd)
         io = s.process(exe, cwd=r_dir)
         log.info('Remote variables set:')
         log.info(f'Remote host = {r_host}')
