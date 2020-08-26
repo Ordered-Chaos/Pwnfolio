@@ -37,9 +37,6 @@ context.update(os=os, arch=arch)
 
 # Attaches gdb to the running process if 'debug' is selected
 def attach_gdb():
-    global script
-    global io
-
     gdb.attach(io, gdbscript=script)
 
 # Checks output for the 'pico' flag and either prints it or 
@@ -62,12 +59,10 @@ def get_flag():
 #
 #
 def start():
-    global mode
     global local
     global remote
     global debug
     global begin
-    global exe
     global io
     global s
     global script
@@ -121,10 +116,10 @@ def start():
 
 def finish():
   global end
-  global begin
-
+  
   end = time.time()
   run_time = end - begin
+  io.close()
   print(f'Time elapsed: {run_time:.2f}')
 
 #===========================================================
