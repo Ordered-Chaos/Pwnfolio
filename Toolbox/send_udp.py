@@ -3,6 +3,7 @@
 import argparse
 from scapy.all import *
 import socket
+import ipaddress
 
 def calculate_checksum(packet):
     """Calculate checksum for a raw packet (two's complement sum of all 16-bit words)."""
@@ -36,7 +37,7 @@ def main():
         help="The destination IP address to send the packet to.",
     )
     parser.add_argument(
-        "--dst-port",
+        "--dport",
         required=False,
         type=int,
         help="The destination port to send the packet to.",
@@ -52,8 +53,7 @@ def main():
         help="The sending port to use in the packet.",
     )
     parser.add_argument(
-        "--pcap",
-        required=True,
+        "pcap_file",
         help="Path to the PCAP file.",
     )
     args = parser.parse_args()
@@ -86,6 +86,15 @@ def main():
     dport = args.dst_port if args.dst_port else udp_packet[UDP].dport
     payload = udp_packet[UDP].payload
 
+    # Validate ip addresses
+    ips = [src_ip, dst_ip]
+    for ip in ips:
+        try:
+            ipaddress.ip_address(ip)
+        except ValueError:
+            print(f"Error: '{ip}' is not valid!")
+            return
+    
     #   Build the Scapy packet
     ip = IP(src=src_ip, dst=dst_ip)
     udp = UDP(sport=sport, dport=dport, len=8 + len(payload))  # UDP length = header (8 bytes) + payload
@@ -107,10 +116,10 @@ def main():
 
     # Send the packet over a raw socket
     try:
-        with socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_UDP) as raw_sock:
+        with socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_RAW) as raw_sock:
             raw_sock.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
-            raw_sock.sendto(raw_packet, (args.dst_ip, 0))  # Port is included in the payload
-            print(f"Packet sent to {args.dst_ip}:{args.dst_port}")
+            raw_sock.sendto(raw_packet, (dst_ip, 0))  # Port is included in the payload
+            print(f"Packet sent to {dst_ip}:{dst_port}")
     except PermissionError:
         print("Permission error: Raw socket requires root privileges. Try running the script with sudo.")
     except Exception as e:
